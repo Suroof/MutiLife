@@ -9,20 +9,20 @@
         '<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0' +
         (coverSupport ? ', viewport-fit=cover' : '') + '" />')
     </script>
-    <title></title>
+    <title>MutiLife</title>
     <!--preload-links-->
     <!--app-context-->
     <!-- Add import map for resolving bare module specifiers -->
     <script type="importmap">
     {
       "imports": {
-        "vue": "./js/vue.esm-browser.js"
+        "vue": "/js/vue.esm-browser.js"
       }
     }
     </script>
   </head>
   <body>
     <div id="app"><!--app-html--></div>
-    <script type="module" src="/main.js"></script>
+    <script type="module" src="./main.js"></script>
   </body>
 </html>

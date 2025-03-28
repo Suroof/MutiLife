@@ -1,6 +1,6 @@
 [build]
-  command = "npm run build:h5" # Use the specific h5 build command
-  publish = "unpackage/dist/build/h5" # This is where uni-app typically builds to
+  command = "npm install && npm run build:netlify" # Using a simpler build command
+  publish = "dist/build/h5" # Updated path for the simplified build
 
 [[redirects]]
   from = "/*"

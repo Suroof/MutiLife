@@ -8,6 +8,19 @@
     "build": "uni build",
     "build:h5": "cross-env NODE_ENV=production UNI_PLATFORM=h5 vue-cli-service uni-build",
     "build:app-plus": "cross-env NODE_ENV=production UNI_PLATFORM=app-plus vue-cli-service uni-build",
-    "build:mp-weixin": "cross-env NODE_ENV=production UNI_PLATFORM=mp-weixin vue-cli-service uni-build"
+    "build:mp-weixin": "cross-env NODE_ENV=production UNI_PLATFORM=mp-weixin vue-cli-service uni-build",
+    "build:netlify": "npx @dcloudio/vue-cli-plugin-uni build --platform h5"
+  },
+  "dependencies": {
+    "vue": "^3.2.45"
+  },
+  "devDependencies": {
+    "@dcloudio/uni-app": "^3.0.0",
+    "@dcloudio/uni-h5": "^3.0.0",
+    "@dcloudio/uni-cli-shared": "^3.0.0",
+    "@dcloudio/uni-ui": "^1.4.20",
+    "@dcloudio/vue-cli-plugin-uni": "^2.0.1",
+    "@vue/cli-service": "^5.0.8",
+    "cross-env": "^7.0.3"
   }
 }
