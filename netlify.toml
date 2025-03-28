@@ -1,0 +1,8 @@
+[build]
+  command = "npm run build:h5" # Use the specific h5 build command
+  publish = "unpackage/dist/build/h5" # This is where uni-app typically builds to
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,0 +1,13 @@
+{
+  "name": "mutilife",
+  "version": "1.0.0",
+  "description": "MutiLife application",
+  "main": "main.js",
+  "scripts": {
+    "dev": "uni",
+    "build": "uni build",
+    "build:h5": "cross-env NODE_ENV=production UNI_PLATFORM=h5 vue-cli-service uni-build",
+    "build:app-plus": "cross-env NODE_ENV=production UNI_PLATFORM=app-plus vue-cli-service uni-build",
+    "build:mp-weixin": "cross-env NODE_ENV=production UNI_PLATFORM=mp-weixin vue-cli-service uni-build"
+  }
+}

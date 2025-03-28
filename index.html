@@ -12,6 +12,14 @@
     <title></title>
     <!--preload-links-->
     <!--app-context-->
+    <!-- Add import map for resolving bare module specifiers -->
+    <script type="importmap">
+    {
+      "imports": {
+        "vue": "./js/vue.esm-browser.js"
+      }
+    }
+    </script>
   </head>
   <body>
     <div id="app"><!--app-html--></div>
