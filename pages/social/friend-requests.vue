@@ -49,7 +49,7 @@
 								<text class="source-label">{{getSourceText(item.source)}}</text>
 								<text class="time">{{item.time}}</text>
 							</view>
-							<text class="greeting" v-if="item.greeting">{{item.greeting}}</text>
+							<text class="greeting" v-if="item.message">{{item.message}}</text>
 						</view>
 					</view>
 
@@ -58,15 +58,12 @@
 							class="action-btn reject-btn"
 							hover-class="btn-hover"
 							@tap="rejectRequest(item, index)"
-							v-if="!item.handled"
 						>拒绝</button>
 						<button
 							class="action-btn accept-btn"
 							hover-class="btn-hover"
 							@tap="acceptRequest(item, index)"
-							v-if="!item.handled"
 						>接受</button>
-						<text class="status-text" v-if="item.handled">{{item.status === 'accepted' ? '已添加' : '已拒绝'}}</text>
 					</view>
 				</view>
 			</view>
@@ -89,7 +86,7 @@
 								<text class="source-label">{{getSourceText(item.source)}}</text>
 								<text class="time">{{item.time}}</text>
 							</view>
-							<text class="greeting" v-if="item.greeting">发送：{{item.greeting}}</text>
+							<text class="greeting" v-if="item.message">发送：{{item.message}}</text>
 						</view>
 					</view>
 
@@ -113,153 +110,175 @@
 			<text class="iconfont add-icon">&#xe61c;</text>
 			<text class="add-text">添加好友</text>
 		</view>
+		<view class="bottom-btns">
+			<view class="bottom-btn" @tap="goToChat">
+				<text class="iconfont chat-icon">&#xe61d;</text>
+				<text class="btn-text">聊天</text>
+			</view>
+			<view class="bottom-btn" @tap="goToMoments">
+				<text class="iconfont moments-icon">&#xe61e;</text>
+				<text class="btn-text">朋友圈</text>
+			</view>
+		</view>
 	</view>
 </template>
 
 <script>
+	import { getFriendRequests, acceptFriendRequest, rejectFriendRequest } from '@/services/api/friend.js';
+	import moment from '@/common/moment.min.js';
+	
 	export default {
 		data() {
 			return {
-				activeTab: 0,
-				receivedRequests: [
-					{
-						id: '101',
-						nickname: '小明',
-						avatar: '/static/images/avatar/1.jpg',
-						source: 'search',
-						time: '2小时前',
-						greeting: '你好，我是小明，我们可以交个朋友吗？',
-						handled: false
-					},
-					{
-						id: '102',
-						nickname: '音乐爱好者',
-						avatar: '/static/images/avatar/2.jpg',
-						source: 'group',
-						time: '昨天',
-						greeting: '我们在音乐爱好者群里见过，加个好友吧~',
-						handled: false
-					},
-					{
-						id: '103',
-						nickname: '张三',
-						avatar: '/static/images/avatar/3.jpg',
-						source: 'nearby',
-						time: '3天前',
-						greeting: '',
-						handled: true,
-						status: 'accepted'
-					},
-					{
-						id: '104',
-						nickname: '李四',
-						avatar: '/static/images/avatar/4.jpg',
-						source: 'recommend',
-						time: '4天前',
-						greeting: '你好，系统推荐了你，很高兴认识你！',
-						handled: true,
-						status: 'rejected'
-					}
-				],
-				sentRequests: [
-					{
-						id: '201',
-						nickname: '王五',
-						avatar: '/static/images/avatar/5.jpg',
-						source: 'search',
-						time: '3小时前',
-						greeting: '你好，我很喜欢你的音乐分享，想加你为好友',
-						status: 'pending'
-					},
-					{
-						id: '202',
-						nickname: '陈六',
-						avatar: '/static/images/avatar/6.jpg',
-						source: 'recommend',
-						time: '昨天',
-						greeting: '嗨，系统说我们有共同兴趣，加个好友吧',
-						status: 'accepted'
-					},
-					{
-						id: '203',
-						nickname: '赵七',
-						avatar: '/static/images/avatar/7.jpg',
-						source: 'nearby',
-						time: '3天前',
-						greeting: '',
-						status: 'rejected'
-					}
-				]
-			}
+				activeTab: 0, // 0: 收到的请求, 1: 发出的请求
+				loading: false,
+				refreshing: false,
+				receivedRequests: [],
+				sentRequests: [],
+				error: null
+			};
+		},
+		onLoad() {
+			this.loadFriendRequests();
 		},
 		methods: {
 			// 返回上一页
 			goBack() {
 				uni.navigateBack();
 			},
-
+			
 			// 切换标签
 			switchTab(index) {
 				this.activeTab = index;
+				// 首次切换到发出的请求标签时加载数据
+				if (index === 1 && this.sentRequests.length === 0) {
+					// 这里可以添加加载发出请求的API
+				}
 			},
-
+			
+			// 加载好友请求
+			async loadFriendRequests() {
+				this.loading = true;
+				this.error = null;
+				
+				try {
+					const response = await getFriendRequests();
+					
+					if (response && response.requests) {
+						// 处理请求数据，添加格式化的时间
+						this.receivedRequests = response.requests.map(request => {
+							const createdTime = moment(request.createdAt);
+							return {
+								id: request._id,
+								userId: request.sender._id,
+								nickname: request.sender.name || request.sender.username,
+								avatar: request.sender.avatar || '/static/images/avatar/default.jpg',
+								message: request.message,
+								source: 'search', // 默认来源
+								time: createdTime.fromNow(), // 相对时间
+								createdAt: request.createdAt
+							};
+						});
+					}
+				} catch (error) {
+					console.error('加载好友请求失败:', error);
+					this.error = '加载失败，请检查网络连接';
+					
+					uni.showToast({
+						title: '加载失败，请稍后重试',
+						icon: 'none'
+					});
+				} finally {
+					this.loading = false;
+					this.refreshing = false;
+				}
+			},
+			
+			// 下拉刷新
+			onRefresh() {
+				this.refreshing = true;
+				this.loadFriendRequests();
+			},
+			
 			// 获取来源描述
 			getSourceText(source) {
 				const sourceMap = {
-					'search': '通过搜索添加',
-					'group': '来自群聊',
+					'search': '搜索添加',
 					'nearby': '附近的人',
 					'recommend': '可能认识的人',
-					'qrcode': '扫码添加'
+					'moments': '朋友圈',
+					'qrcode': '扫码添加',
+					'group': '群聊中添加'
 				};
-				return sourceMap[source] || '请求添加好友';
+				
+				return sourceMap[source] || '未知来源';
 			},
-
+			
 			// 查看用户资料
 			viewProfile(user) {
 				uni.navigateTo({
-					url: `/pages/social/friend-profile?id=${user.id}`
+					url: `/pages/social/friend-profile?id=${user.userId}`
 				});
 			},
-
+			
 			// 接受好友请求
-			acceptRequest(request, index) {
-				uni.showModal({
-					title: '添加好友',
-					content: `是否添加 ${request.nickname} 为好友？`,
-					success: (res) => {
-						if (res.confirm) {
-							// 模拟接受请求
-							this.receivedRequests[index].handled = true;
-							this.receivedRequests[index].status = 'accepted';
-							uni.showToast({
-								title: '已添加为好友',
-								icon: 'success'
-							});
-						}
+			async acceptRequest(request, index) {
+				try {
+					uni.showLoading({
+						title: '处理中...'
+					});
+					
+					const response = await acceptFriendRequest(request.id);
+					
+					if (response && response.success) {
+						// 从列表中移除此请求
+						this.receivedRequests.splice(index, 1);
+						
+						uni.showToast({
+							title: '已添加好友',
+							icon: 'success'
+						});
 					}
-				});
+				} catch (error) {
+					console.error('接受好友请求失败:', error);
+					uni.showToast({
+						title: '添加失败，请稍后重试',
+						icon: 'none'
+					});
+				} finally {
+					uni.hideLoading();
+				}
 			},
-
+			
 			// 拒绝好友请求
-			rejectRequest(request, index) {
-				uni.showModal({
-					title: '拒绝请求',
-					content: `确定拒绝 ${request.nickname} 的好友请求吗？`,
-					success: (res) => {
-						if (res.confirm) {
-							// 模拟拒绝请求
-							this.receivedRequests[index].handled = true;
-							this.receivedRequests[index].status = 'rejected';
-							uni.showToast({
-								title: '已拒绝请求',
-								icon: 'none'
-							});
-						}
+			async rejectRequest(request, index) {
+				try {
+					uni.showLoading({
+						title: '处理中...'
+					});
+					
+					const response = await rejectFriendRequest(request.id);
+					
+					if (response && response.success) {
+						// 从列表中移除此请求
+						this.receivedRequests.splice(index, 1);
+						
+						uni.showToast({
+							title: '已拒绝请求',
+							icon: 'none'
+						});
 					}
-				});
+				} catch (error) {
+					console.error('拒绝好友请求失败:', error);
+					uni.showToast({
+						title: '操作失败，请稍后重试',
+						icon: 'none'
+					});
+				} finally {
+					uni.hideLoading();
+				}
 			},
-
+			
 			// 取消发送的好友请求
 			cancelRequest(request, index) {
 				uni.showModal({
@@ -277,42 +296,59 @@
 					}
 				});
 			},
-
+			
 			// 添加新好友
 			addNewFriend() {
 				uni.showActionSheet({
-					itemList: ['搜索用户添加', '扫一扫', '查看附近的人', '面对面添加'],
+					itemList: ['搜索添加', '扫一扫', '附近的人', '面对面添加'],
 					success: (res) => {
 						switch(res.tapIndex) {
 							case 0:
+								// 搜索添加
 								uni.navigateTo({
 									url: '/pages/social/friend-search'
 								});
 								break;
 							case 1:
+								// 扫一扫
 								uni.scanCode({
 									success: (res) => {
-										console.log('扫码结果：', res);
+										// 处理扫码结果
 										uni.showToast({
-											title: '扫码功能开发中',
+											title: '扫码成功: ' + res.result,
 											icon: 'none'
 										});
 									}
 								});
 								break;
 							case 2:
+								// 附近的人
 								uni.navigateTo({
 									url: '/pages/social/nearby'
 								});
 								break;
 							case 3:
-								uni.showToast({
-									title: '面对面功能开发中',
-									icon: 'none'
+								// 面对面添加
+								uni.navigateTo({
+									url: '/pages/social/face-to-face'
 								});
 								break;
 						}
 					}
+				});
+			},
+			
+			// 导航到聊天页面
+			goToChat() {
+				uni.navigateTo({
+					url: '/pages/social/chat'
+				});
+			},
+			
+			// 导航到朋友圈
+			goToMoments() {
+				uni.navigateTo({
+					url: '/pages/social/moments'
 				});
 			}
 		}
@@ -587,5 +623,36 @@
 
 .add-text {
 	font-size: 28rpx;
+}
+
+.bottom-btns {
+	position: fixed;
+	bottom: calc(60rpx + env(safe-area-inset-bottom));
+	left: 0;
+	right: 0;
+	height: 100rpx;
+	background-color: #FFFFFF;
+	border-top: 1rpx solid #EEEEEE;
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+	padding: 0 40rpx;
+}
+
+.bottom-btn {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.chat-icon, .moments-icon {
+	font-size: 40rpx;
+	margin-bottom: 10rpx;
+}
+
+.btn-text {
+	font-size: 24rpx;
+	color: #666666;
 }
 </style>

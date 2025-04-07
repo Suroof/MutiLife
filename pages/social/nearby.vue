@@ -145,8 +145,16 @@
             </view>
           </view>
 
-          <view class="action-btn" @click.stop="sayHi(user)">
-            <text>打招呼</text>
+          <view class="action-buttons">
+            <view class="action-btn say-hi-btn" @click.stop="sayHi(user)">
+              <text>打招呼</text>
+            </view>
+            <view class="action-btn chat-btn" @click.stop="startChat(user)" v-if="user.isFriend">
+              <text>聊天</text>
+            </view>
+            <view class="action-btn add-btn" @click.stop="addFriend(user)" v-else>
+              <text>加好友</text>
+            </view>
           </view>
         </view>
       </block>
@@ -166,6 +174,22 @@
       </view>
     </scroll-view>
 
+    <!-- 快捷功能按钮 -->
+    <view class="quick-actions">
+      <view class="quick-action-btn" @click="goToSocial">
+        <text class="iconfont icon-home">&#xe672;</text>
+        <text class="action-label">交友主页</text>
+      </view>
+      <view class="quick-action-btn" @click="goToChat">
+        <text class="iconfont icon-chat">&#xe61d;</text>
+        <text class="action-label">我的聊天</text>
+      </view>
+      <view class="quick-action-btn" @click="goToMoments">
+        <text class="iconfont icon-moments">&#xe61e;</text>
+        <text class="action-label">朋友圈</text>
+      </view>
+    </view>
+
     <!-- 加载中遮罩 -->
     <view class="loading-mask" v-if="loading">
       <view class="loading-content">
@@ -177,241 +201,361 @@
 </template>
 
 <script>
+import { getNearbyUsers } from '@/services/api/location.js';
+import { updateLocation } from '@/services/api/location.js';
+import { sendFriendRequest } from '@/services/api/friend.js';
+
 export default {
   data() {
     return {
-      locating: true,
       currentLocation: '',
+      locating: false,
+      loading: false,
       refreshing: false,
-      loading: true,
       hasMore: true,
+      nearbyUsers: [],
+      page: 1,
+      limit: 10,
       genderFilter: 'all',
       distanceFilter: 'all',
       onlineFilter: 'all',
-      nearbyUsers: []
+      latitude: 0,
+      longitude: 0,
+      errorMsg: '',
+      showLocationError: false
     };
   },
   onLoad() {
     this.getLocation();
-    this.loadNearbyUsers();
+  },
+  onPullDownRefresh() {
+    this.onRefresh();
   },
   methods: {
     goBack() {
       uni.navigateBack();
     },
-
+    
     getLocation() {
       this.locating = true;
-
-      // 模拟获取位置
-      setTimeout(() => {
-        this.locating = false;
-        this.currentLocation = '北京市朝阳区三里屯';
-      }, 1500);
+      this.showLocationError = false;
+      
+      uni.getLocation({
+        type: 'gcj02',
+        success: (res) => {
+          this.latitude = res.latitude;
+          this.longitude = res.longitude;
+          this.currentLocation = '已获取当前位置';
+          
+          // 更新位置到服务器
+          this.updateUserLocation(res.latitude, res.longitude);
+          
+          // 获取位置成功后加载附近的人
+          this.loadNearbyUsers();
+        },
+        fail: (err) => {
+          console.error('获取位置失败:', err);
+          this.currentLocation = '获取位置失败，请检查定位权限';
+          this.showLocationError = true;
+          
+          uni.showToast({
+            title: '获取位置失败，请检查定位权限',
+            icon: 'none',
+            duration: 3000
+          });
+        },
+        complete: () => {
+          this.locating = false;
+        }
+      });
     },
-
+    
+    // 更新用户位置到服务器
+    async updateUserLocation(latitude, longitude) {
+      try {
+        // 使用Geo API获取城市名称
+        const locationData = {
+          latitude: latitude,
+          longitude: longitude,
+          isVisible: true // 默认可见
+        };
+        
+        // 尝试获取城市名称
+        try {
+          const res = await new Promise((resolve, reject) => {
+            uni.request({
+              url: `https://api.map.baidu.com/reverse_geocoding/v3/?ak=YOUR_BAIDU_AK&output=json&coordtype=wgs84ll&location=${latitude},${longitude}`,
+              success: resolve,
+              fail: reject
+            });
+          });
+          
+          if (res.data && res.data.result && res.data.result.addressComponent) {
+            locationData.city = res.data.result.addressComponent.city;
+            locationData.address = res.data.result.formatted_address;
+          }
+        } catch (geoError) {
+          console.warn('获取城市信息失败:', geoError);
+        }
+        
+        // 更新位置到服务器
+        await updateLocation(locationData);
+      } catch (error) {
+        console.error('更新位置失败:', error);
+        // 即使更新位置失败，我们仍然可以继续加载附近的人
+      }
+    },
+    
     refreshLocation() {
       this.getLocation();
-      this.refreshing = true;
-      setTimeout(() => {
-        this.refreshing = false;
-        this.loadNearbyUsers();
-      }, 1500);
     },
-
+    
     onRefresh() {
       this.refreshing = true;
-
-      // 模拟刷新操作
-      setTimeout(() => {
-        this.refreshing = false;
-        this.loadNearbyUsers();
-
-        uni.showToast({
-          title: '刷新成功',
-          icon: 'success'
-        });
-      }, 1500);
-    },
-
-    loadMore() {
-      if (!this.hasMore || this.loading) return;
-
-      // 模拟加载更多
-      this.loading = true;
-
-      setTimeout(() => {
-        const moreUsers = [
-          {
-            userId: '6001',
-            nickname: '王强',
-            avatar: '/static/avatar/avatar7.jpg',
-            gender: 'male',
-            distance: '2.7km',
-            statusText: '玩游戏中',
-            online: true,
-            lastActive: '刚刚'
-          },
-          {
-            userId: '7001',
-            nickname: '陈小红',
-            avatar: '/static/avatar/avatar8.jpg',
-            gender: 'female',
-            distance: '3.1km',
-            statusText: '一起听歌吧',
-            online: false,
-            lastActive: '10分钟前'
-          }
-        ];
-
-        this.nearbyUsers = [...this.nearbyUsers, ...moreUsers];
-        this.loading = false;
-
-        // 模拟数据到底了
-        if (this.nearbyUsers.length > 8) {
-          this.hasMore = false;
-        }
-      }, 1500);
-    },
-
-    loadNearbyUsers() {
-      this.loading = true;
+      this.page = 1;
       this.nearbyUsers = [];
-      this.hasMore = true;
-
-      // 模拟加载数据
-      setTimeout(() => {
-        this.nearbyUsers = [
-          {
-            userId: '1001',
-            nickname: '张小明',
-            avatar: '/static/avatar/avatar2.jpg',
-            gender: 'male',
-            distance: '0.5km',
-            statusText: '想认识新朋友',
-            online: true,
-            lastActive: '刚刚'
-          },
-          {
-            userId: '2001',
-            nickname: '李娜',
-            avatar: '/static/avatar/avatar3.jpg',
-            gender: 'female',
-            distance: '0.8km',
-            statusText: '喜欢旅游和摄影',
-            online: true,
-            lastActive: '5分钟前'
-          },
-          {
-            userId: '3001',
-            nickname: '王刚',
-            avatar: '/static/avatar/avatar4.jpg',
-            gender: 'male',
-            distance: '1.2km',
-            statusText: '工作中',
-            online: false,
-            lastActive: '1小时前'
-          },
-          {
-            userId: '4001',
-            nickname: '赵丽',
-            avatar: '/static/avatar/avatar5.jpg',
-            gender: 'female',
-            distance: '1.5km',
-            statusText: '学习ing',
-            online: true,
-            lastActive: '10分钟前'
-          },
-          {
-            userId: '5001',
-            nickname: '周杰',
-            avatar: '/static/avatar/avatar6.jpg',
-            gender: 'male',
-            distance: '1.9km',
-            statusText: '听音乐中',
-            online: false,
-            lastActive: '30分钟前'
-          }
-        ];
-
-        this.loading = false;
-      }, 2000);
+      
+      this.loadNearbyUsers()
+        .finally(() => {
+          this.refreshing = false;
+          uni.stopPullDownRefresh();
+        });
     },
+    
+    loadMore() {
+      if (this.loading || !this.hasMore) return;
+      
+      this.page++;
+      this.loadNearbyUsers(true);
+    },
+    
+    loadNearbyUsers(isLoadMore = false) {
+      if (this.loading && !isLoadMore) return Promise.resolve();
+      
+      this.loading = true;
+      this.errorMsg = '';
+      
+      // 检查是否有位置信息
+      if (!this.latitude || !this.longitude) {
+        this.loading = false;
+        this.errorMsg = '无法获取位置信息，请重试';
+        this.showLocationError = true;
+        return Promise.resolve();
+      }
 
+      const params = {
+        latitude: this.latitude,
+        longitude: this.longitude,
+        radius: this.getRadiusFromFilter(),
+        gender: this.genderFilter !== 'all' ? this.genderFilter : undefined,
+        onlineOnly: this.onlineFilter === 'online',
+        page: this.page,
+        limit: this.limit
+      };
+      
+      // 添加超时处理
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('请求超时，请检查网络连接')), 15000);
+      });
+      
+      // 使用Promise.race进行超时处理
+      return Promise.race([
+        getNearbyUsers(params),
+        timeoutPromise
+      ])
+        .then(response => {
+          if (response && response.success && response.data) {
+            const { users, total } = response.data;
+            
+            if (isLoadMore) {
+              this.nearbyUsers = [...this.nearbyUsers, ...users];
+            } else {
+              this.nearbyUsers = users;
+            }
+            
+            this.hasMore = this.nearbyUsers.length < total;
+            
+            if (users.length === 0 && !isLoadMore) {
+              this.errorMsg = '暂无附近的人';
+            }
+          } else {
+            throw new Error('获取数据失败');
+          }
+        })
+        .catch(error => {
+          console.error('加载附近的人失败:', error);
+          this.errorMsg = error.message || '加载失败，请稍后重试';
+          
+          uni.showToast({
+            title: '连接服务器超时，请重试',
+            icon: 'none',
+            duration: 3000
+          });
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+    
+    getRadiusFromFilter() {
+      switch (this.distanceFilter) {
+        case '1km': return 1;
+        case '5km': return 5;
+        case '10km': return 10;
+        default: return 50; // 默认50km
+      }
+    },
+    
     setGenderFilter(filter) {
       this.genderFilter = filter;
+      this.page = 1;
+      this.nearbyUsers = [];
       this.loadNearbyUsers();
     },
-
+    
     setDistanceFilter(filter) {
       this.distanceFilter = filter;
+      this.page = 1;
+      this.nearbyUsers = [];
       this.loadNearbyUsers();
     },
-
+    
     setOnlineFilter(filter) {
       this.onlineFilter = filter;
+      this.page = 1;
+      this.nearbyUsers = [];
       this.loadNearbyUsers();
     },
-
+    
     viewProfile(userId) {
       uni.navigateTo({
         url: `/pages/social/friend-profile?id=${userId}`
       });
     },
-
+    
+    startChat(user) {
+      uni.navigateTo({
+        url: `/pages/social/chat?id=${user.userId}&name=${user.nickname}`
+      });
+    },
+    
+    // 添加好友
+    async addFriend(user) {
+      try {
+        uni.showLoading({ title: '处理中...' });
+        
+        const response = await sendFriendRequest({
+          receiverId: user.userId,
+          message: `你好，我通过"附近的人"功能找到你，希望能加你为好友`
+        });
+        
+        if (response && response.success) {
+          uni.showToast({
+            title: '好友请求已发送',
+            icon: 'success'
+          });
+        }
+      } catch (error) {
+        console.error('发送好友请求失败:', error);
+        
+        uni.showToast({
+          title: error.message || '发送请求失败，请稍后重试',
+          icon: 'none'
+        });
+      } finally {
+        uni.hideLoading();
+      }
+    },
+    
+    // 打招呼
     sayHi(user) {
       uni.showActionSheet({
         itemList: ['发送: 你好，很高兴认识你', '发送: 我们可以交个朋友吗？', '自定义打招呼'],
         success: (res) => {
           let message = '';
-
+          
           if (res.tapIndex === 0) {
             message = '你好，很高兴认识你';
           } else if (res.tapIndex === 1) {
             message = '我们可以交个朋友吗？';
           } else if (res.tapIndex === 2) {
-            // 使用输入框让用户自定义消息
+            // 自定义消息
             uni.showModal({
-              title: '自定义打招呼',
-              content: '',
+              title: '打招呼',
               editable: true,
-              placeholderText: '输入打招呼消息',
-              success: (modalRes) => {
-                if (modalRes.confirm && modalRes.content) {
-                  this.sendGreeting(user, modalRes.content);
+              placeholderText: '输入打招呼内容',
+              success: (res) => {
+                if (res.confirm && res.content) {
+                  this.sendGreeting(user, res.content);
                 }
               }
             });
             return;
           }
-
+          
           if (message) {
             this.sendGreeting(user, message);
           }
         }
       });
     },
-
-    sendGreeting(user, message) {
-      uni.showLoading({
-        title: '发送中...'
-      });
-
-      setTimeout(() => {
-        uni.hideLoading();
-
+    
+    // 发送打招呼消息
+    async sendGreeting(user, message) {
+      try {
+        uni.showLoading({
+          title: '发送中...'
+        });
+        
+        // 这里应该调用发送消息的API
+        // 暂时模拟一个成功响应
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
         uni.showToast({
-          title: '已发送打招呼',
+          title: '已发送',
           icon: 'success'
         });
-
-        // 可以跳转到聊天页面
-        setTimeout(() => {
-          uni.navigateTo({
-            url: `/pages/social/chat?id=${user.userId}&nickname=${user.nickname}`
-          });
-        }, 1000);
-      }, 1000);
+        
+        // 如果不是好友，询问是否添加好友
+        if (!user.isFriend) {
+          setTimeout(() => {
+            uni.showModal({
+              title: '添加好友',
+              content: '要将对方添加为好友吗？',
+              success: (res) => {
+                if (res.confirm) {
+                  this.addFriend(user);
+                }
+              }
+            });
+          }, 1500);
+        }
+      } catch (error) {
+        uni.showToast({
+          title: '发送失败',
+          icon: 'none'
+        });
+      } finally {
+        uni.hideLoading();
+      }
+    },
+    
+    goToSocial() {
+      uni.switchTab({
+        url: '/pages/social/social'
+      });
+    },
+    
+    goToChat() {
+      uni.navigateTo({
+        url: '/pages/social/chat'
+      });
+    },
+    
+    goToMoments() {
+      uni.navigateTo({
+        url: '/pages/social/moments'
+      });
     }
   }
 };
@@ -610,13 +754,59 @@ export default {
   margin-right: 10px;
 }
 
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
 .action-btn {
-  padding: 8px 15px;
-  background-color: #FF6699;
-  color: #ffffff;
-  font-size: 14px;
-  border-radius: 20px;
-  box-shadow: 0 2px 4px rgba(255, 102, 153, 0.2);
+  padding: 10rpx 20rpx;
+  background-color: #F8F8F8;
+  border-radius: 30rpx;
+  font-size: 24rpx;
+  text-align: center;
+}
+
+.say-hi-btn {
+  background-color: #FFE8EE;
+  color: #FF6699;
+}
+
+.chat-btn {
+  background-color: #E8F4FF;
+  color: #3A86FF;
+}
+
+.add-btn {
+  background-color: #E8FFF2;
+  color: #38C976;
+}
+
+.quick-actions {
+  position: fixed;
+  bottom: 30rpx;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  padding: 20rpx;
+  background-color: #FFFFFF;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+  border-top: 1rpx solid #EEEEEE;
+}
+
+.quick-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10rpx 20rpx;
+}
+
+.action-label {
+  font-size: 24rpx;
+  color: #666666;
+  margin-top: 6rpx;
 }
 
 /* 空状态 */

@@ -166,6 +166,7 @@
 
 <script>
 	import CustomTabBar from '@/components/CustomTabBar.vue'
+	import { isAuthenticated } from '@/services/api/request.js'
 
 	export default {
 		components: {
@@ -174,6 +175,14 @@
 		data() {
 			return {
 				// 数据可以根据需要添加
+			}
+		},
+		onLoad() {
+			// 检查用户是否已登录，如果未登录则重定向到登录页面
+			if (!isAuthenticated()) {
+				uni.navigateTo({
+					url: '/pages/login/login'
+				});
 			}
 		},
 		methods: {
@@ -536,4 +545,11 @@
 		font-size: 24rpx;
 		color: #999;
 	}
+	.app-container {
+		padding: 40rpx 30rpx;
+		background-color: #FFFFFF;
+		min-height: 100vh;
+		box-sizing: border-box;
+	}
+
 </style>

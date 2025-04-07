@@ -13,8 +13,19 @@
 			</view>
 		</view>
 
+		<!-- 加载中提示 -->
+		<view class="loading-tip" v-if="loading">
+			<text class="loading-text">加载中...</text>
+		</view>
+
+		<!-- 错误提示 -->
+		<view class="error-container" v-if="error" @tap="retryLoading">
+			<view class="error-icon">!</view>
+			<view class="error-message">连接服务器超时，点击屏幕重试</view>
+		</view>
+
 		<!-- 个人资料卡 -->
-		<view class="profile-card">
+		<view class="profile-card" v-if="!loading && !error">
 			<!-- 背景图 -->
 			<view class="cover-image">
 				<image :src="userInfo.coverImage" mode="aspectFill"></image>
@@ -50,7 +61,7 @@
 		</view>
 
 		<!-- 资料信息 -->
-		<view class="info-section">
+		<view class="info-section" v-if="!loading && !error">
 			<view class="info-item" v-if="userInfo.location">
 				<text class="iconfont info-icon">&#xe613;</text>
 				<text class="info-text">{{userInfo.location}}</text>
@@ -66,7 +77,7 @@
 		</view>
 
 		<!-- 朋友关系 -->
-		<view class="relation-section">
+		<view class="relation-section" v-if="!loading && !error">
 			<view class="section-header">
 				<text class="section-title">朋友关系</text>
 			</view>
@@ -87,7 +98,7 @@
 		</view>
 
 		<!-- 朋友动态 -->
-		<view class="moment-section">
+		<view class="moment-section" v-if="!loading && !error">
 			<view class="section-header">
 				<text class="section-title">朋友动态</text>
 				<text class="view-all" @tap="viewAllMoments">查看全部</text>
@@ -107,7 +118,7 @@
 		</view>
 
 		<!-- 互动记录 -->
-		<view class="interaction-section">
+		<view class="interaction-section" v-if="!loading && !error">
 			<view class="section-header">
 				<text class="section-title">互动记录</text>
 			</view>
@@ -126,7 +137,7 @@
 		</view>
 
 		<!-- 底部按钮 -->
-		<view class="bottom-actions">
+		<view class="bottom-actions" v-if="!loading && !error">
 			<button class="bottom-btn unfriend-btn" @tap="unfriend">解除好友关系</button>
 			<button class="bottom-btn block-btn" @tap="blockUser">加入黑名单</button>
 		</view>
@@ -134,54 +145,45 @@
 </template>
 
 <script>
-	import moment from '@/common/moment.min.js' // 假设项目中使用了 moment.js 处理日期
+	import moment from '@/utils/moment-wrapper.js'
+	import { getUserById } from '@/services/api/user.js'
+	import { getFriendship } from '@/services/api/friend.js'
 
 	export default {
 		data() {
 			return {
+				loading: true,
+				error: null,
 				userId: null,
 				userInfo: {
-					id: '102456',
-					nickname: '音乐达人',
-					avatar: '/static/images/avatar/6.jpg',
-					coverImage: '/static/images/cover/1.jpg',
-					location: '上海',
-					birthday: '1996-05-15',
-					joinDate: '2022-08-10',
-					tags: ['音乐爱好者', '同城'],
-					friendSince: '2022-09-05'
+					id: '',
+					nickname: '',
+					avatar: '/static/images/avatar/default.jpg',
+					coverImage: '/static/images/cover/default.jpg',
+					location: '',
+					birthday: '',
+					joinDate: '',
+					tags: [],
+					friendSince: ''
 				},
-				moments: [
-					{
-						id: 1,
-						content: '今天去看了一场超棒的音乐会，贝多芬的钢琴协奏曲太震撼了！',
-						images: ['/static/images/moments/1.jpg'],
-						timeAgo: '2小时前'
-					},
-					{
-						id: 2,
-						content: '分享一首最近很喜欢的歌曲，太洗脑了',
-						images: ['/static/images/moments/2.jpg'],
-						timeAgo: '昨天'
-					}
-				],
-				interactions: [
-					{
-						type: 'chat',
-						text: '聊天了23分钟',
-						time: '今天 14:30'
-					},
-					{
-						type: 'moment',
-						text: '点赞了对方的动态',
-						time: '昨天 20:15'
-					},
-					{
-						type: 'gift',
-						text: '收到了礼物"鲜花"',
-						time: '2023-03-10'
-					}
-				]
+				// 模拟数据，用于API调用失败时展示
+				mockData: false,
+				moments: [],
+				interactions: []
+			}
+		},
+		onLoad(options) {
+			// 获取路由参数中的用户ID
+			if (options.id) {
+				this.userId = options.id;
+				this.loadUserInfo();
+			} else {
+				this.error = '未找到用户ID';
+				this.loading = false;
+				uni.showToast({
+					title: '加载失败：未找到用户ID',
+					icon: 'none'
+				});
 			}
 		},
 		computed: {
@@ -199,18 +201,146 @@
 				return `成为好友 ${friendDays} 天`;
 			}
 		},
-		onLoad(options) {
-			if (options && options.id) {
-				this.userId = options.id;
-				this.loadUserInfo();
-			}
-		},
 		methods: {
+			// 重试加载
+			retryLoading() {
+				if (this.userId) {
+					this.error = null;
+					this.loadUserInfo();
+				} else {
+					uni.navigateBack();
+				}
+			},
+			
 			// 加载用户信息
 			loadUserInfo() {
-				// 实际开发中，这里应该根据userId从服务器获取用户信息
-				console.log('加载用户信息:', this.userId);
-				// 模拟数据已在data中设置
+				this.loading = true;
+				this.error = null;
+				
+				console.log('正在加载用户资料，用户ID:', this.userId);
+				
+				// 创建本地测试数据（如果API调用失败可以显示）
+				const testUserInfo = {
+					id: this.userId,
+					nickname: '测试用户',
+					avatar: '/static/images/avatar/default.jpg',
+					coverImage: '/static/images/cover/default.jpg',
+					location: '中国',
+					birthday: '1990-01-01',
+					joinDate: new Date().toISOString(),
+					bio: '这是一个测试用户资料',
+					friendSince: new Date(Date.now() - 30*24*60*60*1000).toISOString(), // 30天前
+					tags: ['朋友', '同事']
+				};
+				
+				// 添加超时处理
+				const timeoutPromise = new Promise((_, reject) => {
+					setTimeout(() => reject(new Error('请求超时，请检查网络连接')), 10000);
+				});
+				
+				// 使用Promise.race进行超时处理
+				Promise.race([
+					getUserById(this.userId),
+					timeoutPromise
+				])
+				.then(response => {
+					console.log('获取用户资料成功:', response);
+					if (!response || !response.data) {
+						throw new Error('获取用户资料失败：服务器返回数据格式错误');
+					}
+					
+					this.userInfo = {
+						...this.userInfo,
+						...response.data
+					};
+					this.mockData = false;
+					
+					// 获取朋友关系
+					return this.loadFriendship();
+				})
+				.then(() => {
+					// 加载用户的动态和互动记录
+					this.loadUserMoments();
+					this.loadInteractions();
+				})
+				.catch(error => {
+					console.error('加载用户资料失败:', error);
+					this.error = error.message || '加载失败，请稍后重试';
+					
+					// 如果API调用失败，使用测试数据
+					if (confirm('无法连接到服务器，是否使用本地测试数据？')) {
+						console.log('使用测试数据');
+						this.userInfo = testUserInfo;
+						this.error = null;
+						this.mockData = true;
+					} else {
+						uni.showToast({
+							title: '连接服务器超时，点击重试',
+							icon: 'none',
+							duration: 2000
+						});
+					}
+				})
+				.finally(() => {
+					this.loading = false;
+				});
+			},
+			
+			// 加载朋友关系信息
+			loadFriendship() {
+				if (this.mockData) return Promise.resolve();
+				
+				return getFriendship(this.userId)
+					.then(response => {
+						if (response && response.data) {
+							this.userInfo.friendSince = response.data.createdAt;
+						}
+					})
+					.catch(error => {
+						console.error('加载朋友关系失败:', error);
+						// 静默失败，不影响界面展示
+					});
+			},
+			
+			// 加载用户动态
+			loadUserMoments() {
+				// 示例动态数据，实际应从API获取
+				this.moments = [
+					{
+						id: 1,
+						content: '今天去看了一场超棒的音乐会，贝多芬的钢琴协奏曲太震撼了！',
+						images: ['/static/images/moments/1.jpg'],
+						timeAgo: '2小时前'
+					},
+					{
+						id: 2,
+						content: '分享一首最近很喜欢的歌曲，太洗脑了',
+						images: ['/static/images/moments/2.jpg'],
+						timeAgo: '昨天'
+					}
+				];
+			},
+			
+			// 加载互动记录
+			loadInteractions() {
+				// 示例互动数据，实际应从API获取
+				this.interactions = [
+					{
+						type: 'chat',
+						text: '聊天了23分钟',
+						time: '今天 14:30'
+					},
+					{
+						type: 'moment',
+						text: '点赞了对方的动态',
+						time: '昨天 20:15'
+					},
+					{
+						type: 'gift',
+						text: '收到了礼物"鲜花"',
+						time: '2023-03-10'
+					}
+				];
 			},
 
 			// 返回上一页
@@ -727,5 +857,21 @@
 	background-color: #FFFFFF;
 	color: #FF3333;
 	border: 1rpx solid #DDDDDD;
+}
+
+.error-container {
+	text-align: center;
+	padding: 40rpx 0;
+}
+
+.error-icon {
+	font-size: 60rpx;
+	color: #FF3333;
+	margin-bottom: 20rpx;
+}
+
+.error-message {
+	font-size: 28rpx;
+	color: #999999;
 }
 </style>

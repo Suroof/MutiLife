@@ -1,7 +1,7 @@
 <template>
 	<view class="container">
 		<!-- 背景模糊效果 -->
-		<view class="bg-image" :style="{ backgroundImage: `url(${currentSong.coverImg})` }"></view>
+		<view class="bg-image" :style="{backgroundImage: 'url(' + currentSong.coverImg + ')'}"></view>
 		<view class="bg-mask"></view>
 
 		<!-- 添加彩色光效 -->

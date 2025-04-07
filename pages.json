@@ -1,5 +1,19 @@
 {
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+	"pages": [
+		{
+			"path": "pages/welcome/index",
+			"style": {
+				"navigationBarTitleText": "Welcome",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "Login",
+				"navigationStyle": "custom"
+			}
+		},
 		{
 			"path": "pages/index/index",
 			"style": {
@@ -31,13 +45,6 @@
 			"style": {
 				"navigationBarTitleText": "新闻",
 				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/login/login",
-			"style": {
-				"navigationBarTitleText": "登录",
-				"navigationStyle": "custom"
 			}
 		},
 		{
@@ -102,7 +109,6 @@
 			"path": "pages/social/group-chat",
 			"style": {
 				"navigationBarTitleText": "群聊",
-				"navigationStyle": "custom",
 				"app-plus": {
 					"animationType": "slide-in-right",
 					"animationDuration": 300
@@ -113,7 +119,6 @@
 			"path": "pages/social/group-info",
 			"style": {
 				"navigationBarTitleText": "群组信息",
-				"navigationStyle": "custom",
 				"app-plus": {
 					"animationType": "slide-in-right",
 					"animationDuration": 300
@@ -124,7 +129,6 @@
 			"path": "pages/social/friend-profile",
 			"style": {
 				"navigationBarTitleText": "好友资料",
-				"navigationStyle": "custom",
 				"app-plus": {
 					"animationType": "slide-in-right",
 					"animationDuration": 300
@@ -135,7 +139,6 @@
 			"path": "pages/social/friend-requests",
 			"style": {
 				"navigationBarTitleText": "好友请求",
-				"navigationStyle": "custom",
 				"app-plus": {
 					"animationType": "slide-in-right",
 					"animationDuration": 300
@@ -146,7 +149,6 @@
 			"path": "pages/social/friend-search",
 			"style": {
 				"navigationBarTitleText": "查找好友",
-				"navigationStyle": "custom",
 				"app-plus": {
 					"animationType": "slide-in-right",
 					"animationDuration": 300
@@ -157,7 +159,6 @@
 			"path": "pages/social/nearby",
 			"style": {
 				"navigationBarTitleText": "附近的人",
-				"navigationStyle": "custom",
 				"app-plus": {
 					"animationType": "slide-in-right",
 					"animationDuration": 300
@@ -168,7 +169,16 @@
 			"path": "pages/social/moments",
 			"style": {
 				"navigationBarTitleText": "朋友圈",
-				"navigationStyle": "custom",
+				"app-plus": {
+					"animationType": "slide-in-right",
+					"animationDuration": 300
+				}
+			}
+		},
+		{
+			"path": "pages/social/face-to-face",
+			"style": {
+				"navigationBarTitleText": "面对面添加",
 				"app-plus": {
 					"animationType": "slide-in-right",
 					"animationDuration": 300
@@ -182,6 +192,7 @@
 		"navigationBarBackgroundColor": "#FFFFFF",
 		"backgroundColor": "#F8F8F8"
 	},
+	
 	"tabBar": {
 		"color": "#8A8A8A",
 		"selectedColor": "#FF6699",

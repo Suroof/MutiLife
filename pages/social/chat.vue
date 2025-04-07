@@ -6,8 +6,8 @@
 				<text class="iconfont back-icon">&#xe602;</text>
 			</view>
 			<view class="nav-title">
-				<text>{{chatUser.nickname}}</text>
-				<text class="status-text" v-if="chatUser.online">在线</text>
+				<text>{{chatUser && chatUser.nickname}}</text>
+				<text class="status-text" v-if="chatUser && chatUser.online">在线</text>
 				<text class="status-text offline" v-else>离线</text>
 			</view>
 			<view class="nav-right" @tap="showOptions">

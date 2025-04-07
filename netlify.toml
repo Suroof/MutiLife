@@ -1,6 +1,7 @@
 [build]
-  command = "npm install && npm run build:netlify" # Using a simpler build command
-  publish = "dist/build/h5" # Updated path for the simplified build
+  # Simple command to copy static files and ensure index.html exists
+  command = "mkdir -p dist && cp -r static/* dist/ && cp static/netlify-index.html dist/index.html"
+  publish = "dist"
 
 [[redirects]]
   from = "/*"
