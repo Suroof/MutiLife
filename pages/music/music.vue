@@ -29,7 +29,7 @@
 			</view>
 
 			<scroll-view class="scroll-view-x" scroll-x="true" show-scrollbar="false">
-				<view class="song-card" v-for="(item, index) in dailyRecommendations" :key="index" @tap="playSong(item)">
+				<view class="song-card" v-for="(item, index) in dailyRecommendations" :key="index" @tap="playRecommendSong(item)">
 					<image class="song-image" :src="item.cover" mode="aspectFill"></image>
 					<view class="song-info">
 						<text class="song-name">{{item.name}}</text>
@@ -108,11 +108,118 @@
 			<view class="player-controls">
 				<text class="iconfont control-icon" @tap.stop="togglePlayStatus">{{isPlaying ? '⏸' : '⏵'}}</text>
 				<text class="iconfont control-icon" @tap.stop="nextSong">⏭</text>
+				<view class="volume-control" @tap.stop>
+					<text class="iconfont volume-icon" @tap.stop="toggleMute">{{volume > 0 ? '🔊' : '🔇'}}</text>
+					<slider class="volume-slider" 
+						min="0" 
+						max="100" 
+						:value="volume" 
+						@change="setVolume"
+						step="1"
+						activeColor="#ff6022"
+						backgroundColor="#dddddd"
+						block-size="12" />
+				</view>
+			</view>
+		</view>
+		
+		<!-- 播放器小组件 -->
+		<view class="mini-player" v-if="currentSong && currentSong._id && !showFullPlayer">
+			<view class="mini-player-left" @tap="openFullPlayer">
+				<image class="mini-song-cover" :src="currentSong.cover || defaultCover" mode="aspectFill"></image>
+				<view class="mini-song-info">
+					<text class="mini-song-name">{{currentSong.name || '未知歌曲'}}</text>
+					<text class="mini-song-artist">{{currentSong.artist || '未知歌手'}}</text>
+				</view>
+			</view>
+			<view class="mini-player-right">
+				<text class="mini-player-btn play-pause-btn iconfont" @tap.stop="togglePlayStatus">
+					{{isPlaying ? '⏸' : '▶'}}
+				</text>
+				<text class="mini-player-btn next-btn iconfont" @tap.stop="nextSong">⏭</text>
 			</view>
 		</view>
 		
 		<!-- 自定义底部导航栏 -->
 		<CustomTabBar />
+		
+		<!-- 全屏播放器弹出层 -->
+		<view class="full-player-popup" v-if="showFullPlayer" @tap="hideFullPlayer">
+			<view class="full-player-mask"></view>
+			<view class="full-player-content" @tap.stop>
+				<!-- 背景模糊效果 -->
+				<view class="bg-image" :style="{backgroundImage: 'url(' + currentSong.cover + ')'}"></view>
+				<view class="bg-mask"></view>
+				
+				<!-- 顶部导航 -->
+				<view class="nav-bar safe-area-inset-top">
+					<view class="nav-left" @tap="hideFullPlayer">
+						<text class="iconfont back-icon">↓</text>
+					</view>
+					<view class="nav-center">
+						<view class="nav-title-container">
+							<text class="nav-title">{{currentSong.name}}</text>
+							<text class="nav-subtitle">{{currentSong.artist}}</text>
+						</view>
+					</view>
+					<view class="nav-right">
+						<text class="iconfont share-icon" @tap="shareSong">→</text>
+					</view>
+				</view>
+				
+				<!-- 主要内容区 -->
+				<view class="content-area">
+					<!-- 唱片动画区 -->
+					<view class="vinyl-area">
+						<view class="vinyl-container" :class="{ 'playing': isPlaying, 'paused': !isPlaying }">
+							<image class="vinyl-disc" src="/static/disc.png" mode="aspectFill"></image>
+							<image class="vinyl-cover" :src="currentSong.cover" mode="aspectFill"></image>
+							<view class="vinyl-reflection"></view>
+						</view>
+					</view>
+					
+					<!-- 播放控制区域 -->
+					<view class="controls-container glass-card">
+						<!-- 播放进度条 -->
+						<view class="progress-bar">
+							<text class="time-text current-time">{{formatTime(currentPlayTime)}}</text>
+							<view class="progress-track">
+								<view class="progress-inner" :style="{width: progressPercentage + '%'}"></view>
+								<view class="progress-handle" :style="{left: progressPercentage + '%'}"></view>
+							</view>
+							<text class="time-text total-time">{{formatTime(currentSong.duration || 0)}}</text>
+						</view>
+						
+						<!-- 播放控制按钮 -->
+						<view class="player-controls">
+							<view class="control-btn prev-btn" @tap="prevSong">
+								<text class="iconfont">⏮</text>
+							</view>
+							<view class="control-btn play-btn" @tap="togglePlayStatus">
+								<text class="iconfont play-icon">{{isPlaying ? '⏸' : '▶'}}</text>
+							</view>
+							<view class="control-btn next-btn" @tap="nextSong">
+								<text class="iconfont">⏭</text>
+							</view>
+						</view>
+						
+						<!-- 音量控制 -->
+						<view class="volume-control-full">
+							<text class="iconfont volume-icon" @tap="toggleMute">{{volume > 0 ? '🔊' : '🔇'}}</text>
+							<slider class="volume-slider-full" 
+								min="0" 
+								max="100" 
+								:value="volume" 
+								@change="setVolume"
+								step="1"
+								activeColor="#ff6022"
+								backgroundColor="#dddddd"
+								block-size="12" />
+						</view>
+					</view>
+				</view>
+			</view>
+		</view>
 	</view>
 </template>
 
@@ -163,8 +270,14 @@
 					artists: true,
 					recentlyPlayed: true
 				},
+				volume: 80, // 音量，范围0-100
+				prevVolume: 80, // 存储静音前的音量
 				audioContext: null, // 音频播放器实例
-				playTimer: null // 进度条更新定时器
+				playTimer: null, // 进度条更新定时器
+				showFullPlayer: false, // 是否显示全屏播放器
+				currentPlayTime: 0, // 当前播放时间
+				progressPercentage: 0, // 播放进度百分比
+				defaultCover: '/static/default-cover.jpg', // 默认封面
 			}
 		},
 		methods: {
@@ -187,6 +300,35 @@
 				try {
 					// 设置当前播放歌曲
 					this.currentSong = song;
+					
+					// 获取歌曲的播放URL（如果需要从API获取）
+					let playUrl = song.url;
+					
+					// 如果歌曲对象中只有ID没有URL，则需要从API获取
+					if (!playUrl && song._id) {
+						try {
+							const response = await request.get(`/music/songs/${song._id}/url`, {}, true);
+							if (response && response.url) {
+								playUrl = response.url;
+								song.url = playUrl; // 更新歌曲对象中的URL
+							}
+						} catch (error) {
+							console.error('获取播放URL失败:', error);
+							uni.showToast({
+								title: '获取歌曲失败，请稍后再试',
+								icon: 'none'
+							});
+							return;
+						}
+					}
+					
+					if (!playUrl) {
+						uni.showToast({
+							title: '歌曲链接无效',
+							icon: 'none'
+						});
+						return;
+					}
 					
 					// 创建或重用音频播放实例
 					if (!this.audioContext) {
@@ -233,42 +375,25 @@
 								icon: 'none'
 							});
 						});
+						
+						// 监听音频时间更新事件
+						this.audioContext.onTimeUpdate(() => {
+							// 更新播放时间和进度
+							this.currentPlayTime = this.audioContext.currentTime;
+							if (this.audioContext.duration > 0) {
+								this.progressPercentage = (this.audioContext.currentTime / this.audioContext.duration) * 100;
+							}
+						});
 					} else {
 						// 如果已经有实例，先停止当前播放
 						this.audioContext.stop();
 					}
 					
-					// 获取歌曲的播放URL（如果需要从API获取）
-					let playUrl = song.url;
-					
-					// 如果歌曲对象中只有ID没有URL，则需要从API获取
-					if (!playUrl && song._id) {
-						try {
-							const response = await request.get(`/music/songs/${song._id}/url`, {}, true);
-							if (response && response.url) {
-								playUrl = response.url;
-							}
-						} catch (error) {
-							console.error('获取播放URL失败:', error);
-							uni.showToast({
-								title: '获取歌曲失败，请稍后再试',
-								icon: 'none'
-							});
-							return;
-						}
-					}
-					
-					if (!playUrl) {
-						uni.showToast({
-							title: '歌曲链接无效',
-							icon: 'none'
-						});
-						return;
-					}
-					
 					// 设置音频源并播放
 					this.audioContext.src = playUrl;
+					this.audioContext.volume = this.volume / 100; // 设置音量
 					this.audioContext.play();
+					this.isPlaying = true; // 确保UI状态同步
 					
 					// 记录播放历史
 					this.recordPlayHistory(song);
@@ -282,18 +407,23 @@
 					});
 				}
 			},
-			
+			// 在每日推荐中播放歌曲
+			playRecommendSong(song) {
+				this.playSong(song);
+				// 不自动打开全屏播放器，用户可以从小组件点击进入
+			},
 			// 切换播放状态
 			togglePlayStatus() {
 				if (!this.currentSong || !this.audioContext) return;
 				
 				if (this.isPlaying) {
 					this.audioContext.pause();
+					this.isPlaying = false;
 				} else {
 					this.audioContext.play();
+					this.isPlaying = true;
 				}
 			},
-			
 			// 播放下一首歌曲
 			nextSong() {
 				if (!this.currentSong) return;
@@ -313,7 +443,6 @@
 					}
 				}
 			},
-			
 			// 开始更新进度条
 			startProgressUpdate() {
 				// 清除可能存在的定时器
@@ -326,6 +455,8 @@
 					// 计算进度百分比
 					if (this.audioContext.duration > 0) {
 						this.progressWidth = (this.audioContext.currentTime / this.audioContext.duration) * 100;
+						this.currentPlayTime = this.audioContext.currentTime;
+						this.progressPercentage = (this.audioContext.currentTime / this.audioContext.duration) * 100;
 					}
 				}, 1000);
 			},
@@ -350,10 +481,19 @@
 				});
 			},
 			openFullPlayer() {
-				// 打开全屏播放器页面
-				uni.navigateTo({
-					url: `/pages/music/player?id=${this.currentSong._id}`
-				});
+				// 显示全屏播放器
+				this.showFullPlayer = true;
+			},
+			hideFullPlayer() {
+				// 隐藏全屏播放器
+				this.showFullPlayer = false;
+				// 确保关闭后小组件显示
+				if (this.currentSong._id) {
+					this.showMiniPlayer = true;
+				}
+			},
+			closeFullPlayer() {
+				this.showFullPlayer = false;
 			},
 			//获取每日推荐歌曲
 			async fetchDailyRecommendations() {
@@ -463,13 +603,71 @@
 				try {
 					console.log('记录播放历史:', song.name);
 					// 使用request工具来发送请求
-					await request.post('/music/history/record', { songId: song._id }, true);
+					await request.post('/music/history', { songId: song._id }, true);
 					
 					console.log('播放历史记录成功:', song.name);
 				} catch (error) {
 					console.error('记录播放历史失败:', error);
 					// 错误已被request工具处理
 				}
+			},
+			// 设置音量
+			setVolume(e) {
+				const newVolume = e.detail.value;
+				this.volume = newVolume;
+				
+				// 设置音频实例的音量
+				if (this.audioContext) {
+					this.audioContext.volume = newVolume / 100;
+				}
+				
+				// 如果音量不为0，更新prevVolume
+				if (newVolume > 0) {
+					this.prevVolume = newVolume;
+				}
+				
+				console.log('音量已设置为:', newVolume);
+			},
+			
+			// 切换静音状态
+			toggleMute() {
+				if (this.volume > 0) {
+					// 当前有声音，切换到静音
+					this.prevVolume = this.volume; // 保存当前音量
+					this.volume = 0;
+				} else {
+					// 当前是静音，恢复到之前的音量
+					this.volume = this.prevVolume || 80;
+				}
+				
+				// 设置音频实例的音量
+				if (this.audioContext) {
+					this.audioContext.volume = this.volume / 100;
+				}
+				
+				console.log('静音状态切换:', this.volume > 0 ? '有声音' : '静音');
+			},
+			shareSong() {
+				uni.share({
+					provider: 'weixin',
+					scene: 'WXSceneSession',
+					type: 0,
+					title: this.currentSong.name,
+					summary: this.currentSong.artist,
+					imageUrl: this.currentSong.cover,
+					href: 'https://example.com',
+					success: (res) => {
+						console.log('分享成功:', res);
+					},
+					fail: (err) => {
+						console.error('分享失败:', err);
+					}
+				});
+			},
+			formatTime(time) {
+				const minutes = Math.floor(time / 60);
+				const seconds = Math.floor(time % 60);
+				return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 			},
 		},
 		onLoad() {
@@ -935,5 +1133,394 @@
 	margin-left: 30rpx;
 	color: #333;
 	font-size: 44rpx;
+}
+
+.volume-control {
+	margin-left: 30rpx;
+	display: flex;
+	align-items: center;
+}
+
+.volume-icon {
+	font-size: 36rpx;
+	margin-right: 10rpx;
+}
+
+.volume-slider {
+	width: 100rpx;
+	margin-left: 10rpx;
+}
+
+/* 播放器小组件样式 */
+.mini-player {
+	position: fixed;
+	bottom: 120rpx;
+	left: 20rpx;
+	right: 20rpx;
+	height: 80rpx;
+	background-color: rgba(255, 255, 255, 0.95);
+	border-radius: 40rpx;
+	display: flex;
+	align-items: center;
+	padding: 0 20rpx;
+	box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+	backdrop-filter: blur(10px);
+	z-index: 99;
+	overflow: hidden;
+}
+
+.mini-player-left {
+	flex: 1;
+	display: flex;
+	align-items: center;
+}
+
+.mini-song-cover {
+	width: 60rpx;
+	height: 60rpx;
+	border-radius: 8rpx;
+	margin-right: 20rpx;
+}
+
+.mini-song-info {
+	flex: 1;
+	overflow: hidden;
+}
+
+.mini-song-name {
+	font-size: 24rpx;
+	font-weight: 500;
+	color: #333;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	margin-bottom: 4rpx;
+}
+
+.mini-song-artist {
+	font-size: 20rpx;
+	color: #999;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.mini-player-right {
+	width: 120rpx;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.mini-player-btn {
+	font-size: 36rpx;
+	color: #333;
+}
+
+.play-pause-btn {
+	margin-right: 20rpx;
+}
+
+/* 全屏播放器样式 */
+.full-player-popup {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 1000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.full-player-mask {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1000;
+}
+
+.full-player-content {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	z-index: 1001;
+	display: flex;
+	flex-direction: column;
+}
+
+.bg-image {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-size: cover;
+	background-position: center;
+	filter: blur(20rpx);
+	transform: scale(1.2);
+	z-index: -1;
+}
+
+.bg-mask {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: linear-gradient(150deg,
+		rgba(10, 10, 30, 0.85) 0%,
+		rgba(60, 10, 80, 0.85) 50%,
+		rgba(120, 40, 90, 0.85) 100%);
+	z-index: -1;
+}
+
+.nav-bar {
+	position: relative;
+	height: 88rpx;
+	padding: 20rpx;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	z-index: 1003;
+}
+
+.nav-left {
+	width: 80rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.back-icon {
+	font-size: 48rpx;
+	color: #FFFFFF;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.nav-center {
+	flex: 1;
+	overflow: hidden;
+	margin: 0 20rpx;
+}
+
+.nav-title-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.nav-title {
+	font-size: 32rpx;
+	font-weight: bold;
+	color: #FFFFFF;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.nav-subtitle {
+	font-size: 24rpx;
+	color: rgba(255, 255, 255, 0.8);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.nav-right {
+	width: 80rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.share-icon {
+	font-size: 48rpx;
+	color: #FFFFFF;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.content-area {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	padding: 40rpx 30rpx;
+	z-index: 1;
+}
+
+.vinyl-area {
+	position: relative;
+	height: 700rpx;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 40rpx;
+}
+
+.vinyl-container {
+	position: relative;
+	width: 500rpx;
+	height: 500rpx;
+	border-radius: 50%;
+	filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+}
+
+.vinyl-container.playing {
+	animation: rotate 20s linear infinite;
+}
+
+.vinyl-container.paused {
+	animation-play-state: paused;
+}
+
+@keyframes rotate {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+.vinyl-disc {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+	z-index: 1;
+	box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.5);
+}
+
+.vinyl-cover {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 300rpx;
+	height: 300rpx;
+	border-radius: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 2;
+	box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.4);
+}
+
+.vinyl-reflection {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 50%);
+	z-index: 3;
+	pointer-events: none;
+}
+
+.controls-container {
+	background-color: rgba(255, 255, 255, 0.1);
+	border-radius: 20rpx;
+	padding: 30rpx;
+	margin-bottom: 40rpx;
+	backdrop-filter: blur(10px);
+}
+
+.progress-bar {
+	display: flex;
+	align-items: center;
+	margin-bottom: 40rpx;
+}
+
+.time-text {
+	color: rgba(255, 255, 255, 0.8);
+	font-size: 24rpx;
+	width: 80rpx;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.progress-track {
+	flex: 1;
+	height: 4rpx;
+	background-color: rgba(255, 255, 255, 0.2);
+	border-radius: 2rpx;
+	margin: 0 20rpx;
+	position: relative;
+}
+
+.progress-inner {
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100%;
+	background: linear-gradient(to right, #FF6699, #FF9B82);
+	border-radius: 2rpx;
+}
+
+.progress-handle {
+	position: absolute;
+	top: 50%;
+	width: 20rpx;
+	height: 20rpx;
+	background-color: #FFFFFF;
+	border-radius: 50%;
+	transform: translate(-50%, -50%);
+	box-shadow: 0 0 5rpx rgba(0, 0, 0, 0.5);
+}
+
+.player-controls {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	margin-bottom: 30rpx;
+}
+
+.control-btn {
+	width: 80rpx;
+	height: 80rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+}
+
+.control-btn .iconfont {
+	color: #FFFFFF;
+	font-size: 44rpx;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.play-btn {
+	width: 120rpx;
+	height: 120rpx;
+	background: linear-gradient(135deg, #FF6699 0%, #FF9B82 100%);
+	border-radius: 60rpx;
+	box-shadow: 0 6rpx 20rpx rgba(255, 102, 153, 0.6);
+}
+
+.play-btn .play-icon {
+	font-size: 60rpx;
+}
+
+.volume-control-full {
+	display: flex;
+	align-items: center;
+}
+
+.volume-slider-full {
+	flex: 1;
+	margin-left: 20rpx;
+}
+
+.safe-area-inset-top {
+	padding-top: env(safe-area-inset-top);
+}
+
+.glass-card {
+	background-color: rgba(255, 255, 255, 0.1);
+	backdrop-filter: blur(10px);
+	border-radius: 20rpx;
+	box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
 }
 </style>
