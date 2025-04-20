@@ -6,11 +6,6 @@
 // 获取当前环境
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
-// 调试信息
-console.log('API配置初始化', {
-  环境: isDevelopment ? '开发环境' : '生产环境',
-  NODE_ENV: process.env.NODE_ENV
-});
 
 const config = {
   // API基础URL，根据环境变量进行区分
@@ -38,10 +33,6 @@ const config = {
   refreshTokenPath: '/auth/refresh'
 };
 
-// 输出最终配置
-console.log('API最终配置:', {
-  baseURL: config.baseURL,
-  timeout: config.timeout
-});
+
 
 export default config;

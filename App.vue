@@ -6,7 +6,6 @@ export default {
     CustomTabBar,
   },
   onLaunch: function () {
-  console.log("App Launch");
   // 注释掉这行来禁用TabBar隐藏
   // this.hideTabBar();
 
@@ -23,10 +22,8 @@ export default {
   }
 },
   onShow: function () {
-    console.log("App Show");
   },
   onHide: function () {
-    console.log("App Hide");
   },
   globalData: {
     userInfo: null,

@@ -65,6 +65,8 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/planner', require('./routes/plannerRoutes'));
 app.use('/api/friends', require('./routes/friendRoutes'));
 app.use('/api/location', require('./routes/locationRoutes'));
+app.use('/api/music', require('./routes/musicRoutes'));
+app.use('/api/news', require('./routes/newsRoutes'));
 
 // 提供静态资源（上传文件）
 app.use('/uploads', express.static(path.join(__dirname, process.env.UPLOAD_PATH || './uploads')));

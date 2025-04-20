@@ -98,6 +98,7 @@
 </template>
 
 <script>
+	import request from "@/services/api/request.js";
 	export default {
 		data() {
 			return {
@@ -108,49 +109,21 @@
 				popupFocus: false,
 				sortNewest: true,
 
-				// 模拟新闻详情数据
+				// 新闻详情数据
 				newsDetail: {
-					title: '人工智能再进化，日常生活将迎来哪些改变？',
-					source: '科技前沿',
-					time: '2023-06-05 08:30',
-					coverImage: 'https://tse4-mm.cn.bing.net/th/id/OIP-C.eZUbrF5ICvANJ9v1sbV4BAHaDt?w=339&h=174&c=7&r=0&o=5&dpr=1.3&pid=1.7',
-					content: '<p style="text-indent:2em;margin-bottom:20px">近日，随着多家科技巨头相继发布最新人工智能产品，AI技术再次成为全球科技界关注的焦点。专家预测，未来几年，人工智能将在医疗健康、交通出行、家居生活等多个领域带来革命性变化。</p><p style="text-indent:2em;margin-bottom:20px">在医疗健康领域，AI辅助诊断系统已经能够以超过人类医生的准确率识别某些疾病。来自斯坦福大学的研究显示，最新的AI影像识别技术在肺结节检测中准确率达到94.6%，比专业放射科医生平均高出8个百分点。</p><p style="text-indent:2em;margin-bottom:20px">"未来，每个人都可能拥有一个AI健康助手，它会通过可穿戴设备持续监测你的健康状况，并在发现异常时及时提醒。"哈佛医学院的张教授表示，"这将大大提高疾病的早期发现率，尤其对于心脑血管疾病的预防意义重大。"</p><p style="text-indent:2em;margin-bottom:20px">在交通领域，随着自动驾驶技术的不断突破，多家汽车制造商宣布计划在2025年前推出L4级别自动驾驶汽车。L4级别意味着在特定条件下，车辆可以完全自主驾驶，无需人类干预。</p><p style="text-indent:2em;margin-bottom:20px">而在家居生活方面，智能家居助手不再仅仅是简单的语音控制设备，它们正在进化为真正了解家庭成员习惯和需求的AI管家。未来的智能家居系统将能够预测家庭成员的行为模式，自动调整家庭环境，甚至在你到家前就为你准备好合适的温度、灯光和音乐。</p><p style="text-indent:2em;margin-bottom:20px">尽管AI技术发展迅猛，但专家也提醒公众注意数据隐私和安全问题。"随着AI系统收集的个人数据越来越多，如何保护这些数据不被滥用成为重要课题。"网络安全专家李教授强调，"我们需要更完善的法律法规来规范AI技术的应用。"</p>',
-					tags: ['人工智能', '科技创新', '未来生活', '医疗科技'],
-					likes: 326,
-					collections: 124,
-					shares: 89
+					title: '',
+					source: '',
+					time: '',
+					coverImage: '',
+					content: '',
+					tags: [],
+					likes: 0,
+					collections: 0,
+					shares: 0
 				},
 
-				// 模拟评论数据
-				comments: [
-					{
-						id: 1,
-						name: '科技爱好者',
-						avatar: 'https://tse4-mm.cn.bing.net/th/id/OIP-C.kQ1yF3EUTztALQowPU_77AHaE7?w=255&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7',
-						content: 'AI确实改变了我们的生活方式，尤其是在医疗领域的应用前景令人期待！',
-						time: '1小时前',
-						likes: 42,
-						isLiked: false
-					},
-					{
-						id: 2,
-						name: '理性思考者',
-						avatar: 'https://tse3-mm.cn.bing.net/th/id/OIP-C.CbR_eQoRDzcm9AaKWVLH2AHaES?w=319&h=185&c=7&r=0&o=5&dpr=1.3&pid=1.7',
-						content: '技术的进步固然重要，但我们也要关注AI带来的伦理问题和就业冲击，需要有合理的监管机制。',
-						time: '2小时前',
-						likes: 38,
-						isLiked: false
-					},
-					{
-						id: 3,
-						name: '医学生小王',
-						avatar: 'https://tse3-mm.cn.bing.net/th/id/OIP-C.Q6CZXmN1TA7DMSFGe2pyIAHaEK?w=301&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7',
-						content: '作为医学专业的学生，对AI在医疗方面的应用特别关注。AI可以帮助医生提高效率，但不能完全替代医生的经验和判断。',
-						time: '3小时前',
-						likes: 27,
-						isLiked: false
-					}
-				]
+				// 评论数据
+				comments: []
 			}
 		},
 		computed: {
@@ -168,21 +141,90 @@
 			// 获取新闻ID参数
 			if (options.id) {
 				this.newsId = options.id;
+				console.log('加载新闻详情，ID:', this.newsId);
 				this.loadNewsDetail();
 			}
 		},
 		methods: {
 			// 加载新闻详情
-			loadNewsDetail() {
-				// 实际应用中，这里应该根据newsId从服务器获取数据
-				// 这里使用模拟数据展示
+			async loadNewsDetail() {
 				uni.showLoading({
 					title: '加载中...'
 				});
-
-				setTimeout(() => {
+				
+				try {
+					// 根据newsId从服务器获取数据
+					const response = await request.get(`/news/${this.newsId}`);
+					console.log('新闻详情响应:', response);
+					
+					if (response.success && response.data) {
+						// 格式化新闻数据
+						this.newsDetail = {
+							title: response.data.title,
+							source: response.data.author || '未知来源',
+							time: this.formatTime(response.data.publishDate),
+							coverImage: response.data.coverImage,
+							content: response.data.content,
+							tags: response.data.tags || [],
+							likes: response.data.likeCount || 0,
+							collections: response.data.collectCount || 0,
+							shares: response.data.shareCount || 0
+						};
+						
+						// 加载评论
+						this.loadComments();
+					} else {
+						uni.showToast({
+							title: '加载新闻失败',
+							icon: 'none'
+						});
+					}
+				} catch (error) {
+					console.error('获取新闻详情失败:', error);
+					uni.showToast({
+						title: '加载新闻失败',
+						icon: 'none'
+					});
+				} finally {
 					uni.hideLoading();
-				}, 800);
+				}
+			},
+			
+			// 加载评论
+			async loadComments() {
+				try {
+					const response = await request.get(`/news/${this.newsId}/comments`);
+					
+					if (response.success && response.data) {
+						this.comments = response.data.map(item => ({
+							id: item._id,
+							name: item.userId.name || item.userId.username,
+							avatar: item.userId.avatar || 'https://tse4-mm.cn.bing.net/th/id/OIP-C.kQ1yF3EUTztALQowPU_77AHaE7?w=255&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7',
+							content: item.content,
+							time: this.formatTime(item.createdAt),
+							likes: item.likeCount || 0,
+							isLiked: item.isLiked || false
+						}));
+					}
+				} catch (error) {
+					console.error('获取评论失败:', error);
+				}
+			},
+			
+			// 格式化时间
+			formatTime(dateString) {
+				const date = new Date(dateString);
+				const now = new Date();
+				const diffMs = now - date;
+				const diffMins = Math.floor(diffMs / (1000 * 60));
+				
+				if (diffMins < 60) {
+					return diffMins + '分钟前';
+				} else if (diffMins < 24 * 60) {
+					return Math.floor(diffMins / 60) + '小时前';
+				} else {
+					return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+				}
 			},
 
 			// 点赞文章
