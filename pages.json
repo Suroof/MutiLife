@@ -65,17 +65,6 @@
 			}
 		},
 		{
-			"path": "pages/music/player",
-			"style": {
-				"navigationBarTitleText": "正在播放",
-				"navigationStyle": "custom",
-				"app-plus": {
-					"animationType": "slide-in-bottom",
-					"animationDuration": 300
-				}
-			}
-		},
-		{
 			"path": "pages/profile/profile",
 			"style": {
 				"navigationBarTitleText": "个人资料",
