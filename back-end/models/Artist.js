@@ -14,6 +14,10 @@ const ArtistSchema = new mongoose.Schema({
     type: String,
     default: '/static/images/music/default-artist-cover.jpg'
   },
+  cover: {
+    type: String,
+    default: '/static/images/music/default-artist-cover.jpg'
+  },
   biography: {
     type: String,
     default: ''

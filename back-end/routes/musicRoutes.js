@@ -18,7 +18,7 @@ router.get('/playlists/hot', musicController.getHotPlaylists);
 router.get('/artists/recommended', musicController.getRecommendedArtists);
 
 // 获取歌单详情
-router.get('/playlists/:playlistId', musicController.getPlaylistDetail);
+router.get('/playlists/:id', musicController.getPlaylistDetail);
 
 // 获取歌曲详情
 router.get('/songs/:songId', musicController.getSongDetail);

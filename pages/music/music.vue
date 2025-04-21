@@ -30,7 +30,7 @@
 
 			<scroll-view class="scroll-view-x" scroll-x="true" show-scrollbar="false">
 				<view class="song-card" v-for="(item, index) in dailyRecommendations" :key="index" @tap="playRecommendSong(item)">
-					<image class="song-image" :src="item.cover" mode="aspectFill"></image>
+					<image class="song-image" :src="item.coverImg" mode="aspectFill"></image>
 					<view class="song-info">
 						<text class="song-name">{{item.name}}</text>
 						<text class="song-artist">{{item.artist}}</text>
@@ -70,7 +70,7 @@
 
 			<scroll-view class="scroll-view-x" :scroll-x="true" :show-scrollbar="false">
 				<view class="artist-card" v-for="(item, index) in recommendedArtists" :key="index" @tap="openArtist(item)">
-					<image class="artist-avatar" :src="item.coverImg" mode="aspectFill"></image>
+					<image class="artist-avatar" :src="item.cover" mode="aspectFill"></image>
 					<text class="artist-name">{{item.name}}</text>
 				</view>
 			</scroll-view>
@@ -173,7 +173,7 @@
 					<view class="vinyl-area">
 						<view class="vinyl-container" :class="{ 'playing': isPlaying, 'paused': !isPlaying }">
 							<image class="vinyl-disc" src="/static/胶片背景.jpg" mode="aspectFill"></image>
-							<image class="vinyl-cover" :src="currentSong.cover" mode="aspectFill"></image>
+							<image class="vinyl-cover" :src="currentSong.coverImg" mode="aspectFill"></image>
 							<view class="vinyl-reflection"></view>
 						</view>
 					</view>
