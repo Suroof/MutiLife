@@ -49,14 +49,14 @@
 			<view class="playlist-grid">
 				<view class="playlist-card" v-for="(item, index) in hotPlaylists" :key="index" @tap="openPlaylist(item)">
 					<view class="playlist-image-container">
-						<image class="playlist-image" :src="item.coverImg" mode="aspectFill"></image>
+						<image class="playlist-image" :src="item.coverImg || item.cover" mode="aspectFill"></image>
 						<view class="play-count">
-							<text class="iconfont play-icon">🠜</text>
+							<text class="iconfont play-icon">🎧</text>
 							<text class="count-text">{{formatCount(item.playCount)}}</text>
 						</view>
 					</view>
 					<text class="playlist-name">{{item.name}}</text>
-					<text class="playlist-desc">{{item.count}}首</text>
+					<text class="playlist-desc">{{item.count || item.songCount || 0}}首</text>
 				</view>
 			</view>
 		</view>
@@ -77,22 +77,22 @@
 		</view>
 
 		<!-- 最近播放 -->
-		<view class="section recent-section">
+		<view class="section">
 			<view class="section-header">
-				<text class="section-title">最近播放</text>
-				<text class="view-all">查看全部</text>
+				<view class="section-title">
+					<text class="title-text">最近播放</text>
+				</view>
+				<text class="view-all" @tap="navigateToPlayHistory">查看全部</text>
 			</view>
-
-			<view class="recent-list">
-				<view class="recent-item" v-for="(item, index) in recentlyPlayed" :key="index" @tap="playSong(item)">
-					<image class="recent-cover" :src="item.cover" mode="aspectFill"></image>
-					<view class="recent-info">
-						<text class="recent-name">{{item.name}}</text>
-						<text class="recent-artist">{{item.artist}}</text>
+			
+			<view class="recent-play-list">
+				<view class="recent-play-item" v-for="(item, index) in recentlyPlayed.slice(0, 3)" :key="index" @tap="playSong(item)">
+					<image class="recent-play-cover" :src="item.cover || defaultCover" mode="aspectFill"></image>
+					<view class="recent-play-info">
+						<text class="recent-play-name">{{item.name}}</text>
+						<text class="recent-play-artist">{{item.artist}}</text>
 					</view>
-					<view class="play-btn">
-						<text class="iconfont play-icon">🎝</text>
-					</view>
+					<text class="iconfont play-icon">▶</text>
 				</view>
 			</view>
 		</view>
@@ -154,7 +154,7 @@
 				<!-- 顶部导航 -->
 				<view class="nav-bar safe-area-inset-top">
 					<view class="nav-left" @tap="hideFullPlayer">
-						<text class="iconfont back-icon">↓</text>
+						 <image class="back-icon" src="/static/icons/下拉.png" mode="aspectFit"></image>
 					</view>
 					<view class="nav-center">
 						<view class="nav-title-container">
@@ -162,8 +162,8 @@
 							<text class="nav-subtitle">{{currentSong.artist}}</text>
 						</view>
 					</view>
-					<view class="nav-right">
-						<text class="iconfont share-icon" @tap="shareSong">→</text>
+					<view class="nav-right" @tap="shareSong">
+						 <image class="share-icon" src="/static/icons/分享.png" mode="aspectFit"></image>
 					</view>
 				</view>
 				
@@ -172,7 +172,7 @@
 					<!-- 唱片动画区 -->
 					<view class="vinyl-area">
 						<view class="vinyl-container" :class="{ 'playing': isPlaying, 'paused': !isPlaying }">
-							<image class="vinyl-disc" src="/static/disc.png" mode="aspectFill"></image>
+							<image class="vinyl-disc" src="/static/胶片背景.jpg" mode="aspectFill"></image>
 							<image class="vinyl-cover" :src="currentSong.cover" mode="aspectFill"></image>
 							<view class="vinyl-reflection"></view>
 						</view>
@@ -289,10 +289,14 @@
 				});
 			},
 			formatCount(count) {
+				if (!count && count !== 0) return '0';
+				
 				if (count < 10000) {
-					return count;
+					return count.toString();
+				} else if (count < 100000000) {
+					return Math.floor(count / 10000) + '万';
 				} else {
-					return (count / 10000).toFixed(1) + '万';
+					return Math.floor(count / 100000000) + '亿';
 				}
 			},
 			// 播放歌曲
@@ -470,8 +474,29 @@
 			},
 			openPlaylist(playlist) {
 				// 跳转到歌单详情页
+				// 检查数据结构，适配不同的ID字段名
+				const playlistId = playlist._id || playlist.id || playlist.playlistId;
+				
+				if (!playlistId) {
+					console.error('无法跳转：歌单ID不存在', playlist);
+					uni.showToast({
+						title: '无法打开歌单',
+						icon: 'none'
+					});
+					return;
+				}
+				
+				console.log('跳转到歌单详情页:', playlistId);
+				
 				uni.navigateTo({
-					url: `/pages/music/playlist-detail?id=${playlist._id}`
+					url: `/pages/music/playlist-detail?id=${playlistId}`,
+					fail: (err) => {
+						console.error('跳转失败:', err);
+						uni.showToast({
+							title: '跳转失败，请稍后再试',
+							icon: 'none'
+						});
+					}
 				});
 			},
 			openArtist(artist) {
@@ -668,6 +693,11 @@
 				const minutes = Math.floor(time / 60);
 				const seconds = Math.floor(time % 60);
 				return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+			},
+			navigateToPlayHistory() {
+				uni.navigateTo({
+					url: '/pages/music/play-history'
+				});
 			},
 		},
 		onLoad() {
@@ -995,7 +1025,7 @@
 	height: 140rpx;
 	border-radius: 50%;
 	margin-bottom: 12rpx;
-	box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.1);
+	box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
 }
 
 .artist-name {
@@ -1008,36 +1038,36 @@
 }
 
 /* 最近播放列表样式 */
-.recent-list {
+.recent-play-list {
 	background-color: #FFFFFF;
 	border-radius: 12rpx;
 	overflow: hidden;
 }
 
-.recent-item {
+.recent-play-item {
 	display: flex;
 	align-items: center;
 	padding: 16rpx 0;
 	border-bottom: 1rpx solid #F5F5F5;
 }
 
-.recent-item:last-child {
+.recent-play-item:last-child {
 	border-bottom: none;
 }
 
-.recent-cover {
+.recent-play-cover {
 	width: 90rpx;
 	height: 90rpx;
 	border-radius: 8rpx;
 	margin-right: 20rpx;
 }
 
-.recent-info {
+.recent-play-info {
 	flex: 1;
 	overflow: hidden;
 }
 
-.recent-name {
+.recent-play-name {
 	font-size: 28rpx;
 	font-weight: 500;
 	color: #333;
@@ -1047,7 +1077,7 @@
 	text-overflow: ellipsis;
 }
 
-.recent-artist {
+.recent-play-artist {
 	font-size: 24rpx;
 	color: #999;
 	white-space: nowrap;
@@ -1157,9 +1187,9 @@
 	bottom: 120rpx;
 	left: 20rpx;
 	right: 20rpx;
-	height: 80rpx;
+	height: 100rpx;
 	background-color: rgba(255, 255, 255, 0.95);
-	border-radius: 40rpx;
+	border-radius: 50rpx;
 	display: flex;
 	align-items: center;
 	padding: 0 20rpx;
@@ -1191,10 +1221,10 @@
 	font-size: 24rpx;
 	font-weight: 500;
 	color: #333;
+	margin-bottom: 4rpx;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	margin-bottom: 4rpx;
 }
 
 .mini-song-artist {
@@ -1342,6 +1372,7 @@
 }
 
 .share-icon {
+	width: 60%;
 	font-size: 48rpx;
 	color: #FFFFFF;
 	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -1501,6 +1532,8 @@
 
 .play-btn .play-icon {
 	font-size: 60rpx;
+	padding-left: 10rpx;
+	padding-bottom:6rpx;
 }
 
 .volume-control-full {

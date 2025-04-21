@@ -105,6 +105,17 @@
 			}
 		},
 		{
+			"path": "pages/music/playlist-detail",
+			"style": {
+				"navigationBarTitleText": "歌单详情",
+				"app-plus": {
+					"animationType": "slide-in-right",
+					"animationDuration": 300
+				}
+			}
+		},
+	
+		{
 			"path": "pages/social/group-info",
 			"style": {
 				"navigationBarTitleText": "群组信息",
