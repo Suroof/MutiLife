@@ -1,0 +1,38 @@
+/* Reset CSS to provide consistent styling baseline across all pages */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+  }
+
+  /* Reset for inputs and buttons */
+  input, button, textarea, select {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* Remove default styling for links */
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  /* Reset lists */
+  ul, ol {
+    list-style: none;
+  }
+
+  /* Fix line-height */
+  body, h1, h2, h3, h4, h5, h6, p {
+    line-height: 1.5;
+  }
+
+  /* Prevent text size adjustments on orientation changes (iOS) */
+  html {
+    -webkit-text-size-adjust: 100%;
+  }

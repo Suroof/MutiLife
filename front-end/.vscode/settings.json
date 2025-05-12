@@ -1,0 +1,7 @@
+{
+    "git.ignoreLimitWarning": true,
+    "editor.gotoLocation.multipleDefinitions": "goto",
+    "javascript.preferGoToSourceDefinition": false,
+    "typescript.preferGoToSourceDefinition": false,
+    "editor.gotoLocation.multipleTypeDefinitions": "gotoAndPeek"
+}

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS 测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .test-card {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        input {
+            padding: 8px;
+            margin: 5px 0;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>CORS 测试页面</h1>
+
+    <div class="test-card">
+        <h2>测试 1: CORS 健康检查</h2>
+        <p>测试基本CORS配置是否正确</p>
+        <button onclick="testCors()">测试 CORS 配置</button>
+        <div id="corsResult"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>测试 2: 登录请求测试</h2>
+        <p>测试登录API是否能跨域工作</p>
+
+        <label for="username">用户名:</label>
+        <input type="text" id="username" value="admin">
+
+        <label for="password">密码:</label>
+        <input type="password" id="password" value="password">
+
+        <div style="margin-top: 15px;">
+            <button onclick="testLogin()">测试登录</button>
+        </div>
+        <div id="loginResult"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>测试 3: 直接登录测试</h2>
+        <p>测试备用登录API</p>
+        <button onclick="testDirectLogin()">测试直接登录</button>
+        <div id="directLoginResult"></div>
+    </div>
+
+    <script>
+        // 显示结果的辅助函数
+        function showResult(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `
+                <pre style="color: ${isError ? 'red' : 'green'}">
+${JSON.stringify(data, null, 2)}
+                </pre>
+            `;
+        }
+
+        // 测试1: CORS配置
+        async function testCors() {
+            try {
+                const result = document.getElementById('corsResult');
+                result.innerHTML = '<p>测试中...</p>';
+
+                const response = await fetch('http://localhost:9500/api/test-cors', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+                showResult('corsResult', data);
+            } catch (error) {
+                showResult('corsResult', { error: error.message }, true);
+            }
+        }
+
+        // 测试2: 登录
+        async function testLogin() {
+            try {
+                const result = document.getElementById('loginResult');
+                result.innerHTML = '<p>登录中...</p>';
+
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                const response = await fetch('http://localhost:9500/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password }),
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+                showResult('loginResult', data);
+            } catch (error) {
+                showResult('loginResult', { error: error.message }, true);
+            }
+        }
+
+        // 测试3: 直接登录
+        async function testDirectLogin() {
+            try {
+                const result = document.getElementById('directLoginResult');
+                result.innerHTML = '<p>直接登录中...</p>';
+
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                const response = await fetch('http://localhost:9500/api/direct-auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password }),
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+                showResult('directLoginResult', data);
+            } catch (error) {
+                showResult('directLoginResult', { error: error.message }, true);
+            }
+        }
+    </script>
+</body>
+</html>

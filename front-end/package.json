@@ -1,0 +1,22 @@
+{
+  "name": "mutilife",
+  "version": "1.0.0",
+  "description": "MutiLife application",
+  "main": "index.html",
+  "scripts": {
+    "dev": "serve .",
+    "build": "npm run build:h5",
+    "dev:h5": "uni -p h5",
+    "build:h5": "uni build -p h5"
+  },
+  "dependencies": {
+    "@dcloudio/uni-ui": "^1.5.7",
+    "dotenv": "^16.5.0",
+    "moment": "^2.30.1"
+  },
+  "devDependencies": {
+    "@dcloudio/uni-cli-shared": "^2.0.2-4060420250429001",
+    "@dcloudio/webpack-uni-mp-loader": "^2.0.2-4060420250429001",
+    "serve": "^14.2.1"
+  }
+}

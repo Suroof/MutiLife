@@ -1,0 +1,9 @@
+[build]
+  # Simple command to copy static files and ensure index.html exists
+  command = "mkdir -p dist && cp -r static/* dist/ && cp static/netlify-index.html dist/index.html"
+  publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

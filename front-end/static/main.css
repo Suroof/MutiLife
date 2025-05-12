@@ -1,0 +1,154 @@
+/* Common styles for the app */
+
+/* Import reset styles */
+@import url('./reset.css');
+
+/* Glass morphism effect */
+.glass-card {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.dark-glass-card {
+  background: rgba(30, 30, 30, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #FF6699 0%, #FF9B82 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+}
+
+/* Music player specific */
+.music-category-item {
+  position: relative;
+  padding: 30rpx 40rpx;
+  font-size: 28rpx;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.3s;
+}
+
+.music-category-item.active {
+  color: #FFFFFF;
+  font-weight: bold;
+}
+
+.music-category-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 40rpx;
+  height: 6rpx;
+  background: linear-gradient(135deg, #FF6699 0%, #FF9B82 100%);
+  border-radius: 3rpx;
+  transform: translateX(-50%);
+}
+
+/* Card hover effects */
+.hover-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Button styles */
+.gradient-btn {
+  background: linear-gradient(135deg, #FF6699 0%, #FF9B82 100%);
+  color: white;
+  border: none;
+  border-radius: 50rpx;
+  padding: 20rpx 40rpx;
+  font-weight: bold;
+  box-shadow: 0 6rpx 20rpx rgba(255, 102, 153, 0.4);
+  transition: all 0.3s ease;
+}
+
+.gradient-btn:active {
+  transform: translateY(2rpx);
+  box-shadow: 0 4rpx 10rpx rgba(255, 102, 153, 0.3);
+}
+
+/* Scrollbar customization */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Animations */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.slide-up {
+  animation: slideUp 0.5s ease forwards;
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Custom shadows */
+.music-card-shadow {
+  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.15);
+}
+
+/* Auth pages shared styles - these will be loaded globally but won't affect other pages */
+.auth-page-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* General app layout */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}

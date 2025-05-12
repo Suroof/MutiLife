@@ -1,0 +1,273 @@
+{
+	"pages": [
+		{
+			"path": "pages/welcome/index",
+			"style": {
+				"navigationBarTitleText": "Welcome",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "Login",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "MutiLife",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/travel/travel",
+			"style": {
+				"navigationBarTitleText": "旅游",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/social/social",
+			"style": {
+				"navigationBarTitleText": "交友",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/music/music",
+			"style": {
+				"navigationBarTitleText": "听歌"
+			}
+		},
+		{
+			"path": "pages/planner/planner",
+			"style": {
+				"navigationBarTitleText": "时间规划"
+			}
+		},
+		{
+			"path": "pages/news/news",
+			"style": {
+				"navigationBarTitleText": "新闻",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/mine/mine",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/login/register",
+			"style": {
+				"navigationBarTitleText": "注册",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/news/detail",
+			"style": {
+				"navigationBarTitleText": "新闻详情",
+				"app-plus": {
+					"animationType": "slide-in-right",
+					"animationDuration": 300
+				}
+			}
+		},
+		{
+			"path": "pages/social/chat",
+			"style": {
+				"navigationBarTitleText": "聊天",
+				"app-plus": {
+					"animationType": "slide-in-right",
+					"animationDuration": 300
+				}
+			}
+		},
+		{
+			"path": "pages/mine/settings",
+			"style": {
+				"navigationBarTitleText": "设置",
+				"app-plus": {
+					"animationType": "slide-in-right",
+					"animationDuration": 300
+				}
+			}
+		},
+		{
+			"path": "pages/planner/category-details",
+			"style": {
+			  "navigationBarTitleText": "分类详情",
+			  "navigationStyle": "custom"
+			}
+		  },
+		{
+			"path": "pages/mine/about",
+			"style": {
+				"navigationBarTitleText": "设置",
+				"app-plus": {
+					"animationType": "slide-in-right",
+					"animationDuration": 300
+				}
+			}
+		},
+		{
+			"path": "pages/mine/change-password",
+			"style": {
+				"navigationBarTitleText": "设置",
+				"app-plus": {
+					"animationType": "slide-in-right",
+					"animationDuration": 300
+				}
+			}
+		},
+		{
+			"path": "pages/social/group-chat",
+			"style": {
+				"navigationBarTitleText": "群聊",
+				"app-plus": {
+					"animationType": "slide-in-right",
+					"animationDuration": 300
+				}
+			}
+		},
+
+		{
+			"path": "pages/music/playlist-detail",
+			"style": {
+				"navigationBarTitleText": "歌单详情",
+				"app-plus": {
+					"animationType": "slide-in-right",
+					"animationDuration": 300
+				}
+			}
+		},
+
+		{
+			"path": "pages/social/group-info",
+			"style": {
+				"navigationBarTitleText": "群组信息",
+				"app-plus": {
+					"animationType": "slide-in-right",
+					"animationDuration": 300
+				}
+			}
+		},
+		{
+			"path": "pages/social/friend-profile",
+			"style": {
+				"navigationBarTitleText": "好友资料",
+				"app-plus": {
+					"animationType": "slide-in-right",
+					"animationDuration": 300
+				}
+			}
+		},
+		{
+			"path": "pages/social/friend-requests",
+			"style": {
+				"navigationBarTitleText": "好友请求",
+				"app-plus": {
+					"animationType": "slide-in-right",
+					"animationDuration": 300
+				}
+			}
+		},
+		{
+			"path": "pages/social/friend-search",
+			"style": {
+				"navigationBarTitleText": "查找好友",
+				"app-plus": {
+					"animationType": "slide-in-right",
+					"animationDuration": 300
+				}
+			}
+		},
+		{
+			"path": "pages/social/nearby",
+			"style": {
+				"navigationBarTitleText": "附近的人",
+				"app-plus": {
+					"animationType": "slide-in-right",
+					"animationDuration": 300
+				}
+			}
+		},
+		{
+			"path": "pages/social/moments",
+			"style": {
+				"navigationBarTitleText": "朋友圈",
+				"app-plus": {
+					"animationType": "slide-in-right",
+					"animationDuration": 300
+				}
+			}
+		},
+		{
+			"path": "pages/social/face-to-face",
+			"style": {
+				"navigationBarTitleText": "面对面添加",
+				"app-plus": {
+					"animationType": "slide-in-right",
+					"animationDuration": 300
+				}
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "MutiLife",
+		"navigationBarBackgroundColor": "#FFFFFF",
+		"backgroundColor": "#F8F8F8"
+	},
+
+	"tabBar": {
+		"color": "#8A8A8A",
+		"selectedColor": "#FF6699",
+		"backgroundColor": "#FFFFFF",
+		"borderStyle": "white",
+		"list": [
+			{
+				"pagePath": "pages/travel/travel",
+				"text": "旅游",
+				"iconPath": "static/tabbar/旅游2.png",
+				"selectedIconPath": "static/tabbar/旅游.png"
+			},
+			{
+				"pagePath": "pages/social/social",
+				"text": "交友",
+				"iconPath": "static/tabbar/social.png",
+				"selectedIconPath": "static/tabbar/social-active.png"
+			},
+			{
+				"pagePath": "pages/music/music",
+				"text": "听歌",
+				"iconPath": "static/tabbar/music.png",
+				"selectedIconPath": "static/tabbar/music-active.png"
+			},
+			{
+				"pagePath": "pages/planner/planner",
+				"text": "规划",
+				"iconPath": "static/tabbar/planner.png",
+				"selectedIconPath": "static/tabbar/planner-active.png"
+			},
+			{
+				"pagePath": "pages/news/news",
+				"text": "新闻",
+				"iconPath": "static/tabbar/news.png",
+				"selectedIconPath": "static/tabbar/news-active.png"
+			},
+			{
+				"pagePath": "pages/mine/mine",
+				"text": "我的",
+				"iconPath": "static/tabbar/user.png",
+				"selectedIconPath": "static/tabbar/user-active.png"
+			}
+		]
+	},
+	"uniIdRouter": {}
+}
