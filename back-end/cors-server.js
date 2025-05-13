@@ -13,8 +13,11 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:5173',  // Vite 默认开发服务器
   'http://127.0.0.1:5173',
-  'http://localhost:8080',  // 其他可能的前端服务器
-  'http://localhost:3000'   // 其他可能的前端服务器
+  'http://localhost:8080',
+  'http://localhost:3000',
+  'https://www.mutilife.fun',
+  'https://sparkly-malasada-024a66.netlify.app/',
+  'https://static-mp-6d87654f-232c-4315-a526-4bc5b0650787.next.bspapp.com'
 ];
 
 // CORS配置（单独配置以便于调试）

@@ -334,6 +334,7 @@ app.use((req, res, next) => {
     // 此处明确设置CORS头以确保预检请求能正确处理
     const origin = req.headers.origin;
     if (origin && allowedOrigins.includes(origin)) {
+      res.header('Vary', 'Origin');
       res.header('Access-Control-Allow-Origin', origin);
       res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
       res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
