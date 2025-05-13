@@ -24,7 +24,9 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
   'http://localhost:8080',
-  'http://localhost:3000'
+  'http://localhost:3000',
+  'https://www.mutilife.fun',
+  'https://mutilife.fun'
 ];
 
 // 增强CORS配置 - 使用origin函数更精确控制
@@ -88,6 +90,65 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     timestamp: new Date().toISOString()
   });
+});
+
+// 添加诊断路由 - 数据库连接检查
+app.get('/api/debug/db', async (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+
+    // 检查连接状态
+    const connectionState = ['断开连接', '已连接', '正在连接', '正在断开连接'];
+
+    // 尝试简单查询以验证连接
+    let queryResult = '未测试';
+    if (mongoose.connection.readyState === 1) {
+      try {
+        // 获取所有集合名称
+        const collections = await mongoose.connection.db.listCollections().toArray();
+        queryResult = `成功! 发现 ${collections.length} 个集合: ${collections.map(c => c.name).join(', ')}`;
+      } catch (queryErr) {
+        queryResult = `查询失败: ${queryErr.message}`;
+      }
+    }
+
+    res.json({
+      dbState: mongoose.connection.readyState,
+      dbStateDesc: connectionState[mongoose.connection.readyState] || '未知状态',
+      dbUrl: process.env.MONGODB_URL ? '已设置 (隐藏敏感信息)' : '未设置',
+      mongooseVersion: mongoose.version,
+      nodeEnv: process.env.NODE_ENV || '未设置',
+      queryTest: queryResult,
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error('数据库调试路由错误:', err);
+    res.status(500).json({
+      error: err.message,
+      stack: process.env.NODE_ENV === 'production' ? '在生产环境中隐藏' : err.stack
+    });
+  }
+});
+
+// 简单的测试数据路由
+app.get('/api/test-data', async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      message: '测试数据路由成功',
+      data: {
+        testItems: [
+          { id: 1, name: '测试项目1' },
+          { id: 2, name: '测试项目2' }
+        ]
+      },
+      env: process.env.NODE_ENV,
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error('测试数据路由错误:', err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // 添加直接测试路由 - 不依赖路由文件
