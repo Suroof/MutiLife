@@ -11,7 +11,7 @@ const config = {
   // API基础URL，根据环境变量进行区分
   baseURL: isDevelopment
     ? 'http://localhost:9500/api'  // 开发环境API地址
-    : 'https://your-production-api.com/api',  // 生产环境API地址
+    : 'https://www.mutilife.fun/api',  // 生产环境API地址
 
   // 请求超时时间（毫秒）
   timeout: 15000, // 15秒
