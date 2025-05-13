@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "rootDirectory": ".",
   "build": {
     "command": "npm install", 
     "entrypoint": "app.js"   
