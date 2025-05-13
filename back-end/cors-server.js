@@ -16,7 +16,7 @@ const allowedOrigins = [
   'http://localhost:8080',
   'http://localhost:3000',
   'https://www.mutilife.fun',
-  'https://sparkly-malasada-024a66.netlify.app/',
+  'https://mutilife.netlify.app',
   'https://static-mp-6d87654f-232c-4315-a526-4bc5b0650787.next.bspapp.com'
 ];
 
