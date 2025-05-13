@@ -7,12 +7,19 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+// 检测是否运行在Vercel或其他无服务器环境中
+const isServerless = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
+
 // Configure storage for avatar uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadDir = path.join(__dirname, '../uploads/avatars');
+    // 在无服务器环境中使用/tmp目录，否则使用相对路径
+    const baseDir = isServerless ? '/tmp' : path.join(__dirname, '..');
+    const uploadDir = path.join(baseDir, 'uploads/avatars');
+
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
+      console.log(`创建头像上传目录: ${uploadDir}`);
     }
     cb(null, uploadDir);
   },

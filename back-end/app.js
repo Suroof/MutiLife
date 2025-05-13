@@ -237,13 +237,21 @@ try {
 console.log('===== 路由文件加载完成 =====');
 
 // 提供静态资源（上传文件）
-app.use('/uploads', express.static(path.join(__dirname, process.env.UPLOAD_PATH || './uploads')));
+// 检测是否运行在Vercel或其他无服务器环境中
+const isServerless = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
+
+// 在无服务器环境中使用/tmp目录，否则使用相对路径
+const uploadDirBase = isServerless ? '/tmp' : __dirname;
+const uploadPath = process.env.UPLOAD_PATH || './uploads';
+const uploadDir = path.join(uploadDirBase, uploadPath.replace(/^\.\//, ''));
+
+app.use('/uploads', express.static(uploadDir));
 
 // 创建上传目录（如果不存在）
 const fs = require('fs');
-const uploadDir = path.join(__dirname, process.env.UPLOAD_PATH || './uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
+  console.log(`创建上传目录: ${uploadDir}`);
 }
 
 // 健康检查路由
