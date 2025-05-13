@@ -28,7 +28,7 @@ const allowedOrigins = [
   'https://www.mutilife.fun',
   'https://mutilife.fun',
   'https://static-mp-6d87654f-232c-4315-a526-4bc5b0650787.next.bspapp.com',
-  "https://mutilife.netlify.app/"
+  "https://mutilife.netlify.app"
 ];
 
 // 增强CORS配置 - 使用origin函数更精确控制
