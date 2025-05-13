@@ -26,7 +26,8 @@ const allowedOrigins = [
   'http://localhost:8080',
   'http://localhost:3000',
   'https://www.mutilife.fun',
-  'https://mutilife.fun'
+  'https://mutilife.fun',
+  'https://static-mp-6d87654f-232c-4315-a526-4bc5b0650787.next.bspapp.com'
 ];
 
 // 增强CORS配置 - 使用origin函数更精确控制
