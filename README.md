@@ -1,6 +1,7 @@
 # MutiLife 多彩生活  让手机只有一个app
-![image](https://github.com/user-attachments/assets/9ab00ef2-dfe1-4fb5-bdb4-ab63c73949be)
+![image](https://github.com/user-attachments/assets/8febe1e8-289f-4645-958d-e2b14c762b1b)
 
+https://mutilife.netlify.app/#/pages/index/index
 *探索您的多彩生活*  
 
 ---
