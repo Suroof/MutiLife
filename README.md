@@ -111,12 +111,12 @@ front-end/
 | 新闻服务            | `/api/news/`   | 新闻文章、分类、评论等                 |
 
 ## 📱 应用截图
-- ![image](https://github.com/user-attachments/assets/b3ef053d-7c9d-4fe3-8013-781744648bca)
-- ![image](https://github.com/user-attachments/assets/4c472b47-b0b6-431d-8499-1f9c1e214fcb)
-- ![image](https://github.com/user-attachments/assets/b664782a-f8f8-47b5-9ff4-3a98e305b24a)
-- ![image](https://github.com/user-attachments/assets/726487f5-ac29-481c-9dfa-5043cf32886c)
-- ![image](https://github.com/user-attachments/assets/f0957bd4-aa05-4622-ba19-828c09d00ace)
-- ![image](https://github.com/user-attachments/assets/567d3447-d221-43af-b380-423028cd61c4)
+- ![image](https://github.com/user-attachments/assets/15510457-d854-4a3f-8e43-99c2a073e8d6)
+
+- ![image](https://github.com/user-attachments/assets/f50f7a03-ddc2-4eca-a895-2fac0e4b856f)
+
+- ![image](https://github.com/user-attachments/assets/87c24226-7697-4a8e-a024-ef420ab85ecb)
+
 
 ---
 MutiLife - 让生活更多彩 © 2025
