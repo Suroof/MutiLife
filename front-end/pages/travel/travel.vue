@@ -248,7 +248,7 @@ export default {
     //获取详情
     handleDetail(id) {
       uni.navigateTo({
-        url: `/pages/travel/detail?id=${id}`,
+        url: `/pages/travel/destinationsDetail?id=${id}`,
       });
     },
     // 获取目的地数据
