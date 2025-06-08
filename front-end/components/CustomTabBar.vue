@@ -32,11 +32,6 @@
       <text class="tab-text">新闻</text>
     </view>
 
-    <!-- Mine Tab -->
-    <view class="tab-item" :class="{ active: currentTab === 6 }" @tap="switchTab('/pages/mine/mine', 6)">
-      <image class="tab-icon" :src="currentTab === 6 ? '/static/tabbar/我的2.png' : '/static/tabbar/我的.png'" mode="aspectFit"></image>
-      <text class="tab-text">我的</text>
-    </view>
   </view>
 </template>
 

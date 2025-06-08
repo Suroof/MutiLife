@@ -581,6 +581,7 @@ export default {
   transition: all 0.3s;
   position: relative;
   overflow: hidden;
+  margin-bottom:50px;
 }
 
 .logout-button::before {

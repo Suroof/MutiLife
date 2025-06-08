@@ -10,8 +10,9 @@
       <view class="avatar-container">
         <image
           class="avatar"
-          src="/static/avatar.jpg"
+          src="../../static/avatar/avatar6.jpg"
           mode="aspectFill"
+          @click="toggleMine"
         ></image>
       </view>
     </view>
@@ -243,7 +244,8 @@ export default {
     this.fetchFeaturedExperiences();
   },
   methods: {
-	//获取详情
+
+    //获取详情
     handleDetail(id) {
       uni.navigateTo({
         url: `/pages/travel/detail?id=${id}`,
@@ -371,6 +373,12 @@ export default {
       }
     },
 
+    //跳转到我的页面
+    toggleMine() {
+      uni.navigateTo({
+        url: "/pages/mine/mine",
+      });
+    },
     // 监听信息卡片滚动，更新指示点
     onInfoScroll(e) {
       // 根据滚动位置计算当前显示的卡片

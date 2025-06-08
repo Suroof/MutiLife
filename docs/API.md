@@ -1,7 +1,7 @@
 # MutiLife API文档
 
 ## 基础信息
-- 基础URL: `http://localhost:5000/api`
+- 基础URL: `http://localhost:9500/api`
 - 认证方式: JWT Token (在请求头中使用`Authorization: Bearer {token}`)
 - 响应格式: JSON
 

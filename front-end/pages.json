@@ -101,10 +101,10 @@
 		{
 			"path": "pages/planner/category-details",
 			"style": {
-			  "navigationBarTitleText": "分类详情",
-			  "navigationStyle": "custom"
+				"navigationBarTitleText": "分类详情",
+				"navigationStyle": "custom"
 			}
-		  },
+		},
 		{
 			"path": "pages/mine/about",
 			"style": {
@@ -135,7 +135,6 @@
 				}
 			}
 		},
-
 		{
 			"path": "pages/music/playlist-detail",
 			"style": {
@@ -146,7 +145,6 @@
 				}
 			}
 		},
-
 		{
 			"path": "pages/social/group-info",
 			"style": {
@@ -224,7 +222,6 @@
 		"navigationBarBackgroundColor": "#FFFFFF",
 		"backgroundColor": "#F8F8F8"
 	},
-
 	"tabBar": {
 		"color": "#8A8A8A",
 		"selectedColor": "#FF6699",
@@ -260,12 +257,6 @@
 				"text": "新闻",
 				"iconPath": "static/tabbar/news.png",
 				"selectedIconPath": "static/tabbar/news-active.png"
-			},
-			{
-				"pagePath": "pages/mine/mine",
-				"text": "我的",
-				"iconPath": "static/tabbar/user.png",
-				"selectedIconPath": "static/tabbar/user-active.png"
 			}
 		]
 	},

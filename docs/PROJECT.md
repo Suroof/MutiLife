@@ -72,3 +72,6 @@ MutiLife/
 3. 添加数据分析和可视化
 4. 增强社交互动功能
 5. 开发小程序版本
+
+## 快速上手
+底部栏设置:\components\CustomTabBar.vue
