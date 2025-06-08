@@ -9,13 +9,13 @@ const FeaturedExperience = require('../models/FeaturedExperience');
 const connectToDatabase = async () => {
   try {
     // 直接使用连接字符串
-    const mongoURI = 'mongodb://localhost:27017/mutilife';
-    console.log('尝试连接到 MongoDB:', mongoURI);
+    const mongoURL = 'mongodb://localhost:27017/mutilife';
+    console.log('尝试连接到 MongoDB:', mongoURL);
 
     // 设置 strictQuery 选项以消除警告
     mongoose.set('strictQuery', false);
 
-    await mongoose.connect(mongoURI, {
+    await mongoose.connect(mongoURL, {
       useNewUrlParser: true,
       useUnifiedTopology: true
     });
