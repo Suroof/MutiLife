@@ -248,6 +248,22 @@ export default {
   },
 
   /**
+   * PATCH请求
+   * @param {string} url - 请求路径
+   * @param {Object} data - 请求数据
+   * @param {boolean} auth - 是否需要认证
+   * @returns {Promise} 请求结果Promise
+   */
+  patch: (url, data = {}, auth = false) => {
+    return request({
+      url,
+      method: "PATCH",
+      data,
+      auth,
+    });
+  },
+
+  /**
    * DELETE请求
    * @param {string} url - 请求路径
    * @param {Object} data - 请求数据

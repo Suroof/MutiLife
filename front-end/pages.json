@@ -29,7 +29,7 @@
       }
     },
     {
-      "path": "pages/travel/destinationsDetail",
+      "path": "pages/travel/FeatureDetail",
       "style": {
         "navigationBarTitleText": "详情",
 		"navigationStyle": "custom"
@@ -65,6 +65,13 @@
       "path": "pages/mine/mine",
       "style": {
         "navigationBarTitleText": "我的",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mine/favorites",
+      "style": {
+        "navigationBarTitleText": "收藏",
         "navigationStyle": "custom"
       }
     },

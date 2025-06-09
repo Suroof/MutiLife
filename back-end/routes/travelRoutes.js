@@ -21,6 +21,15 @@ router.get('/featured-experiences', travelController.getFeaturedExperiences);
 router.get('/featured-experiences/:id', travelController.getFeaturedExperienceById);
 
 // 切换收藏状态
-router.patch('/destinations/:id/bookmark', travelController.toggleBookmark);
+router.patch('/featured-experiences/:id/bookmark', travelController.toggleBookmark);
+
+// 获取用户收藏列表
+router.get('/favorites', travelController.getFavorites);
+
+// 清空用户收藏列表
+router.delete('/favorites/clear', travelController.clearFavorites);
+
+// 获取用户收藏数量
+router.get('/favorites/count', travelController.getFavoritesCount);
 
 module.exports = router;

@@ -1,6 +1,5 @@
 <script>
 import CustomTabBar from "./components/CustomTabBar.vue";
-
 export default {
   components: {
     CustomTabBar,

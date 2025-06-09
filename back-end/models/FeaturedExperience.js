@@ -7,6 +7,8 @@ const FeaturedExperienceSchema = new Schema({
   image: { type: String, required: true },
   rating: { type: Number, required: true, min: 0, max: 5 },
   reviewCount: { type: Number, default: 0 },
+  isBookmarked: { type: Boolean, default: false },
+  bookmarkedAt: { type: Date, default: null },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
