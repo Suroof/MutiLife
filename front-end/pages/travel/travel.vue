@@ -3,9 +3,7 @@
     <!-- 顶部导航栏 -->
     <view class="header">
       <view class="menu-icon">
-        <text class="icon-line"></text>
-        <text class="icon-line"></text>
-        <text class="icon-line"></text>
+        <text class="position-text">Travel</text>
       </view>
       <view class="avatar-container">
         <image
@@ -36,15 +34,15 @@
 
     <!-- 分类导航 -->
     <view class="categories-nav">
-      <view class="category-item active">
-        <text class="category-text">Experiences</text>
-        <view class="active-dot"></view>
-      </view>
-      <view class="category-item">
-        <text class="category-text">Places</text>
-      </view>
-      <view class="category-item">
-        <text class="category-text">Housings</text>
+      <view
+        v-for="(category, index) in categories"
+        :key="index"
+        class="category-item"
+        :class="{ active: category.active }"
+        @click="selectCategory(category.name)"
+      >
+        <text class="category-text">{{ category.name }}</text>
+        <view v-if="category.active" class="active-dot"></view>
       </view>
     </view>
 
@@ -62,7 +60,7 @@
     >
       <view
         class="discover-card"
-        v-for="(item, index) in destinations"
+        v-for="(item, index) in filteredDestinations"
         :key="'dest-' + index"
       >
         <image
@@ -86,7 +84,7 @@
       </view>
     </scroll-view>
 
-    <!-- 冒险模式 -->
+    <!-- 冒险想法 -->
     <view class="mood-section">
       <view class="section-header">
         <text class="section-title">Adventurous Mood?</text>
@@ -108,6 +106,7 @@
           class="activity-item"
           v-for="(item, index) in activities"
           :key="'act-' + index"
+          @tap="showActivityInfo(item)"
         >
           <view
             class="activity-icon"
@@ -226,6 +225,13 @@ export default {
         infoCards: true,
         featuredExperiences: true,
       },
+      categories: [
+        { name: "Experiences", active: true },
+        { name: "Places", active: false },
+        { name: "Housings", active: false },
+      ],
+      currentCategory: "Experiences",
+      filteredDestinations: [],
     };
   },
   onLoad() {
@@ -242,9 +248,9 @@ export default {
     this.fetchActivities();
     this.fetchInfoCards();
     this.fetchFeaturedExperiences();
+    this.filterContent();
   },
   methods: {
-
     //获取详情
     handleDetail(id) {
       uni.navigateTo({
@@ -257,6 +263,7 @@ export default {
         const response = await request.get("/travel/destinations");
         if (response.success) {
           this.destinations = response.data;
+          console.log(this.destinations)
         } else {
           uni.showToast({
             title: "获取目的地数据失败",
@@ -392,6 +399,49 @@ export default {
         this.infoCardIndex = index;
       }
     },
+
+    //打开详情模态框
+    showActivityInfo(item) {
+      const description = item.description || "暂无详细介绍";
+      const formattedDescription = `${description}`;
+      uni.showModal({
+        title: item.name,
+        content: formattedDescription,
+        showCancel: false,
+        confirmText: "确定",
+      });
+    },
+
+    selectCategory(categoryName) {
+      // 更新分类状态
+      this.categories = this.categories.map((cat) => ({
+        ...cat,
+        active: cat.name === categoryName,
+      }));
+
+      // 设置当前分类
+      this.currentCategory = categoryName;
+
+      // 可以在这里调用 filterContent 方法来过滤内容
+      this.filterContent();
+    },
+
+    filterContent() {
+      if (this.currentCategory === "Experiences") {
+        // 显示 Experiences 类型的目的地
+        this.filteredDestinations = this.destinations.filter(
+          (d) => d.type === 1
+        );
+      } else if (this.currentCategory === "Places") {
+        this.filteredDestinations = this.destinations.filter(
+          (d) => d.type === 2
+        );
+      } else if (this.currentCategory === "Housings") {
+        this.filteredDestinations = this.destinations.filter(
+          (d) => d.type === 3
+        );
+      }
+    },
   },
 };
 </script>
@@ -432,32 +482,22 @@ export default {
 }
 
 .menu-icon {
-  width: 40rpx;
-  height: 30rpx;
+  width: 12 0rpx;
+  height: 50rpx;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   transition: all 0.3s;
 }
 
-.menu-icon:active {
-  transform: scale(0.95);
-}
-
-.icon-line {
-  width: 100%;
-  height: 3rpx;
-  background-color: #333;
-  transition: all 0.3s;
-}
-
-.menu-icon:hover .icon-line:nth-child(1) {
-  width: 70%;
-}
-
-.menu-icon:hover .icon-line:nth-child(3) {
-  width: 70%;
-  margin-left: auto;
+.position-text {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #333;
+  background: linear-gradient(135deg, #3e4c4a, #5d91c5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.2;
 }
 
 .avatar-container {
