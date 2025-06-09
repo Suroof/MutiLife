@@ -11,7 +11,6 @@ export default {
   // 检查是否存在用户信息
   const userInfo = uni.getStorageSync('userInfo');
   if (!userInfo) {
-    console.log('用户未登录，导航到登录页面');
     // 如果是首次加载，并且没有用户信息，跳转到登录页
     setTimeout(() => {
       uni.navigateTo({

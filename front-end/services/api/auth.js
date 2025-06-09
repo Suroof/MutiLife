@@ -26,10 +26,6 @@ export const register = (userData) => {
  */
 export const login = async (credentials) => {
   try {
-    console.log('发送登录请求:', {
-      username: credentials.username,
-      passwordLength: credentials.password.length
-    });
 
     // 确保我们的请求是完整的
     if (!credentials.username || !credentials.password) {
@@ -37,11 +33,9 @@ export const login = async (credentials) => {
     }
 
     const response = await request.post('/auth/login', credentials);
-    console.log('登录响应:', response);
 
     // 保存返回的令牌
     if (response && response.token) {
-      console.log('设置令牌');
       setToken(response.token);
     } else {
       console.warn('未收到令牌');

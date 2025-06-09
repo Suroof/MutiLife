@@ -84,7 +84,6 @@ export default {
       })
         .then((response) => {
           uni.hideLoading();
-          console.log("Login successful:", JSON.stringify(response));
 
           if (response && response.user) {
             try {

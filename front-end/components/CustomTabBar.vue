@@ -75,8 +75,6 @@ export default {
     },
     switchTab(url, index) {
       if (this.currentTab === index) return;
-
-      console.log('TabBar导航到:', url);
       this.currentTab = index;
 
       // 尝试使用switchTab（适用于tabBar页面）

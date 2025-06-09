@@ -51,7 +51,6 @@ export default {
 	},
 	methods: {
 		navigateTo(url) {
-			console.log('正在导航到:', url);
 			uni.switchTab({
 				url: url,
 				fail: (err) => {

@@ -17,9 +17,6 @@ export default {
     return {};
   },
   onLoad() {
-    // 检查用户是否已登录的逻辑已移除
-    // 现在欢迎页将始终显示，不会自动跳转
-    console.log('欢迎页已加载');
   },
   methods: {
     navigateToLogin() {

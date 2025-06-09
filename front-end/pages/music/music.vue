@@ -340,28 +340,25 @@
 
 						// 配置音频播放器
 						this.audioContext.onPlay(() => {
-							console.log('开始播放');
 							this.isPlaying = true;
 							// 开始更新进度条
 							this.startProgressUpdate();
 						});
 
 						this.audioContext.onPause(() => {
-							console.log('暂停播放');
 							this.isPlaying = false;
 							// 停止更新进度条
 							this.stopProgressUpdate();
 						});
 
 						this.audioContext.onStop(() => {
-							console.log('停止播放');
+
 							this.isPlaying = false;
 							// 停止更新进度条
 							this.stopProgressUpdate();
 						});
 
 						this.audioContext.onEnded(() => {
-							console.log('播放结束');
 							this.isPlaying = false;
 							// 停止更新进度条
 							this.stopProgressUpdate();
@@ -402,7 +399,6 @@
 					// 记录播放历史
 					this.recordPlayHistory(song);
 
-					console.log('播放歌曲:', song.name, '链接:', playUrl);
 				} catch (error) {
 					console.error('播放歌曲出错:', error);
 					uni.showToast({
@@ -486,7 +482,6 @@
 					return;
 				}
 
-				console.log('跳转到歌单详情页:', playlistId);
 
 				uni.navigateTo({
 					url: `/pages/music/playlist-detail?id=${playlistId}`,
@@ -527,7 +522,6 @@
 					// 使用request工具来发送请求，自动携带认证信息
 					const response = await request.get('/music/daily-recommendations', {}, true);
 
-					console.log('每日推荐响应:', response);
 
 					// 处理数据
 					if (Array.isArray(response)) {
@@ -537,8 +531,6 @@
 					} else if (response.data) {
 						this.dailyRecommendations = response.data;
 					}
-
-					console.log('每日推荐获取成功:', this.dailyRecommendations);
 				} catch (error) {
 					console.error('获取每日推荐出错:', error);
 					// 错误已被request工具处理，无需额外处理
@@ -553,7 +545,6 @@
 					// 使用request工具来发送请求
 					const response = await request.get('/music/playlists/hot', {}, true);
 
-					console.log('热门歌单响应:', response);
 
 					// 处理数据
 					if (Array.isArray(response)) {
@@ -563,8 +554,6 @@
 					} else if (response.data) {
 						this.hotPlaylists = response.data;
 					}
-
-					console.log('热门歌单获取成功:', this.hotPlaylists);
 				} catch (error) {
 					console.error('获取热门歌单出错:', error);
 					// 错误已被request工具处理
@@ -579,7 +568,6 @@
 					// 使用request工具来发送请求
 					const response = await request.get('/music/artists/recommended', {}, true);
 
-					console.log('推荐歌手响应:', response);
 
 					// 处理数据
 					if (Array.isArray(response)) {
@@ -590,7 +578,6 @@
 						this.recommendedArtists = response.data;
 					}
 
-					console.log('推荐歌手获取成功:', this.recommendedArtists);
 				} catch (error) {
 					console.error('获取推荐歌手出错:', error);
 				} finally {
@@ -604,7 +591,6 @@
 					// 使用request工具来发送请求
 					const response = await request.get('/music/history', {}, true);
 
-					console.log('最近播放响应:', response);
 
 					// 处理数据
 					if (Array.isArray(response)) {
@@ -615,7 +601,6 @@
 						this.recentlyPlayed = response.data;
 					}
 
-					console.log('最近播放获取成功:', this.recentlyPlayed);
 				} catch (error) {
 					console.error('获取最近播放出错:', error);
 					// 错误已被request工具处理

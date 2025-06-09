@@ -13,7 +13,6 @@ require('dotenv').config();
 const app = express();
 
 // 设置静态文件服务 - 移到最前面确保优先级
-console.log('配置静态文件目录:', path.join(__dirname, 'public'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // 解析JSON请求体 - 在CORS之前确保能处理请求体
@@ -40,7 +39,6 @@ app.use(cors({
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.log('CORS拒绝来源:', origin);
       callback(new Error('不允许的来源'));
     }
   },

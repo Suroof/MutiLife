@@ -263,7 +263,6 @@ export default {
         const response = await request.get("/travel/destinations");
         if (response.success) {
           this.destinations = response.data;
-          console.log(this.destinations)
         } else {
           uni.showToast({
             title: "获取目的地数据失败",
@@ -413,16 +412,11 @@ export default {
     },
 
     selectCategory(categoryName) {
-      // 更新分类状态
       this.categories = this.categories.map((cat) => ({
         ...cat,
         active: cat.name === categoryName,
       }));
-
-      // 设置当前分类
       this.currentCategory = categoryName;
-
-      // 可以在这里调用 filterContent 方法来过滤内容
       this.filterContent();
     },
 
@@ -479,6 +473,8 @@ export default {
   margin-bottom: 30rpx;
   position: relative;
   z-index: 1;
+  background-image:linear-gradient(135deg, #f16021, #f3ba71) ;
+  border-radius: 18px;
 }
 
 .menu-icon {
@@ -494,10 +490,11 @@ export default {
   font-size: 40rpx;
   font-weight: bold;
   color: #333;
-  background: linear-gradient(135deg, #3e4c4a, #5d91c5);
+  background:linear-gradient(135deg, #fffdb4, #9386ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   line-height: 1.2;
+  margin-left:11px;
 }
 
 .avatar-container {
