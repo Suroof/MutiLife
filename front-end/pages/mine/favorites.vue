@@ -31,7 +31,7 @@
       v-else
       class="scroll-container"
       scroll-y
-      @scrolltolower="onLoad"
+      @scrolltolower="onLoadMore"
       refresher-enabled
       :refresher-triggered="refreshing"
       @refresherrefresh="onRefresh"
@@ -117,8 +117,10 @@ export default {
   },
 
   onShow() {
-    // 页面显示时刷新收藏列表
-    this.loadFavorites();
+    // 页面显示时只有在数据为空时才重新加载
+    if (this.favorites.length === 0) {
+      this.checkAuthAndLoadFavorites();
+    }
   },
 
   methods: {
@@ -164,7 +166,12 @@ export default {
         
         if (response.success) {
           const newFavorites = response.data || [];
-          this.favorites = [...this.favorites, ...newFavorites];
+          
+          // 数据去重：基于 _id 字段去重
+          const existingIds = new Set(this.favorites.map(item => item._id));
+          const uniqueNewFavorites = newFavorites.filter(item => !existingIds.has(item._id));
+          
+          this.favorites = [...this.favorites, ...uniqueNewFavorites];
           
           // 如果没有更多数据
           if (newFavorites.length < this.pageSize) {
@@ -198,9 +205,11 @@ export default {
       this.loadFavorites(true);
     },
 
-    // 上拉加载
-    onLoad() {
-      this.loadFavorites(false);
+    // 上拉加载更多
+    onLoadMore() {
+      if (!this.finished && !this.loadingList) {
+        this.loadFavorites(false);
+      }
     },
 
     // 返回上一页
