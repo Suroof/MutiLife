@@ -6,12 +6,7 @@
         <text class="position-text">Travel</text>
       </view>
       <view class="avatar-container">
-        <image
-          class="avatar"
-          src="../../static/avatar/avatar6.jpg"
-          mode="aspectFill"
-          @click="toggleMine"
-        ></image>
+        <image class="avatar" src="../../static/avatar/avatar6.jpg" mode="aspectFill" @click="toggleMine"></image>
       </view>
     </view>
 
@@ -24,23 +19,14 @@
     <view class="search-section">
       <view class="search-bar">
         <text class="search-icon">🔍</text>
-        <input
-          type="text"
-          placeholder="Search destinations"
-          class="search-input"
-        />
+        <input type="text" placeholder="Search destinations" class="search-input" />
       </view>
     </view>
 
     <!-- 分类导航 -->
     <view class="categories-nav">
-      <view
-        v-for="(category, index) in categories"
-        :key="index"
-        class="category-item"
-        :class="{ active: category.active }"
-        @click="selectCategory(category.name)"
-      >
+      <view v-for="(category, index) in categories" :key="index" class="category-item"
+        :class="{ active: category.active }" @click="selectCategory(category.name)">
         <text class="category-text">{{ category.name }}</text>
         <view v-if="category.active" class="active-dot"></view>
       </view>
@@ -52,28 +38,10 @@
     </view>
 
     <!-- 探索卡片区域 -->
-    <scroll-view
-      v-else
-      class="discover-scroll"
-      scroll-x="true"
-      show-scrollbar="false"
-    >
-      <view
-        class="discover-card"
-        v-for="(item, index) in filteredDestinations"
-        :key="'dest-' + index"
-      >
-        <image
-          class="discover-image"
-          :src="item.mainImage"
-          mode="aspectFill"
-        ></image>
-        <view
-          class="bookmark-icon"
-          @tap.stop="toggleBookmark(item._id)"
-          v-if="item.isBookmarked"
-          >📍</view
-        >
+    <scroll-view v-else class="discover-scroll" scroll-x="true" show-scrollbar="false">
+      <view class="discover-card" v-for="(item, index) in filteredDestinations" :key="'dest-' + index">
+        <image class="discover-image" :src="item.mainImage" mode="aspectFill"></image>
+        <view class="bookmark-icon" @tap.stop="toggleBookmark(item._id)" v-if="item.isBookmarked">📍</view>
         <view class="card-content">
           <text class="card-title">{{ item.name }}</text>
           <view class="location">
@@ -96,27 +64,11 @@
         <view class="loading-spinner"></view>
       </view>
 
-      <scroll-view
-        v-else
-        class="activities-scroll"
-        scroll-x="true"
-        show-scrollbar="false"
-      >
-        <view
-          class="activity-item"
-          v-for="(item, index) in activities"
-          :key="'act-' + index"
-          @tap="showActivityInfo(item)"
-        >
-          <view
-            class="activity-icon"
-            :style="{ backgroundColor: item.iconBackground }"
-          >
-            <image
-              :src="item.icon"
-              mode="aspectFit"
-              class="activity-icon-image"
-            ></image>
+      <scroll-view v-else class="activities-scroll" scroll-x="true" show-scrollbar="false">
+        <view class="activity-item" v-for="(item, index) in activities" :key="'act-' + index"
+          @tap="showActivityInfo(item)">
+          <view class="activity-icon" :style="{ backgroundColor: item.iconBackground }">
+            <image :src="item.icon" mode="aspectFit" class="activity-icon-image"></image>
           </view>
           <text class="activity-name">{{ item.name }}</text>
         </view>
@@ -128,12 +80,8 @@
       <view class="section-header">
         <text class="section-title">Useful Information</text>
         <view class="pagination-dots">
-          <view
-            class="dot"
-            v-for="(item, index) in infoCards"
-            :key="'dot-' + index"
-            :class="{ active: infoCardIndex === index }"
-          ></view>
+          <view class="dot" v-for="(item, index) in infoCards" :key="'dot-' + index"
+            :class="{ active: infoCardIndex === index }"></view>
         </view>
       </view>
 
@@ -142,19 +90,9 @@
         <view class="loading-spinner"></view>
       </view>
 
-      <scroll-view
-        v-else
-        class="info-scroll"
-        scroll-x="true"
-        show-scrollbar="false"
-        @scroll="onInfoScroll"
-      >
-        <view
-          class="info-card"
-          v-for="(item, index) in infoCards"
-          :key="'info-' + index"
-          @tap="goToUsefulInfomation(item._id)"
-        >
+      <scroll-view v-else class="info-scroll" scroll-x="true" show-scrollbar="false" @scroll="onInfoScroll">
+        <view class="info-card" v-for="(item, index) in infoCards" :key="'info-' + index"
+          @tap="goToUsefulInfomation(item._id)">
           <image class="info-image" :src="item.image" mode="aspectFill"></image>
           <view class="info-button">{{ item.buttonText || "Learn more" }}</view>
         </view>
@@ -165,7 +103,10 @@
     <view class="featured-section">
       <view class="section-header">
         <text class="section-title">Featured Experiences</text>
-        <text class="view-all">View all</text>
+        <view class="pagination-feature-dots">
+          <view class="featureDot" v-for="(page, index) in featuredTotalPages" :key="'dot-' + index"
+            :class="{ active: featuredExperienceIndex === index }"></view>
+        </view>
       </view>
 
       <!-- 加载中状态 -->
@@ -173,18 +114,9 @@
         <view class="loading-spinner"></view>
       </view>
 
-      <view v-else class="featured-grid">
-        <view
-          class="featured-card"
-          v-for="(item, index) in featuredExperiences"
-          :key="'feat-' + index"
-        >
-          <image
-            class="featured-image"
-            :src="item.image"
-            mode="aspectFill"
-            @tap="handleDetail(item._id)"
-          ></image>
+      <scroll-view v-else class="featured-grid" scroll-x="true" show-scrollbar="false" @scroll="onFeatureScroll">
+        <view class="featured-card" v-for="(item, index) in featuredExperiences" :key="'feat-' + index">
+          <image class="featured-image" :src="item.image" mode="aspectFill" @tap="handleDetail(item._id)"></image>
           <view class="featured-content">
             <text class="featured-title">{{ item.title }}</text>
             <view class="featured-rating">
@@ -193,7 +125,7 @@
             </view>
           </view>
         </view>
-      </view>
+      </scroll-view>
     </view>
 
     <view style="height: -10rpx"></view>
@@ -218,6 +150,7 @@ export default {
       infoCards: [],
       featuredExperiences: [],
       infoCardIndex: 0,
+      featuredExperienceIndex: 0,
       loading: {
         destinations: true,
         activities: true,
@@ -232,6 +165,12 @@ export default {
       currentCategory: "Experiences",
       filteredDestinations: [],
     };
+  },
+  computed: {
+    // 计算特色体验的总页数
+    featuredTotalPages() {
+      return Math.ceil(this.featuredExperiences.length / 4);
+    }
   },
   onLoad() {
     // 检查用户是否已登录，如果未登录则重定向到登录页面
@@ -399,6 +338,21 @@ export default {
       }
     },
 
+    // 监听特色体验卡片滚动，更新指示点
+    onFeatureScroll(e) {
+      if (!this.featuredExperiences.length) return;
+
+      const scrollLeft = e.detail.scrollLeft;
+      const cardWidth = 340; // featured-card的宽度(320rpx) + margin(20rpx)
+      const cardsPerPage = 4; // 每页显示4张卡片
+      const pageWidth = cardWidth * cardsPerPage; // 每页的宽度
+      const currentPage = Math.round(scrollLeft / pageWidth);
+
+      if (currentPage >= 0 && currentPage < this.featuredTotalPages) {
+        this.featuredExperienceIndex = currentPage;
+      }
+    },
+
     //打开详情模态框
     showActivityInfo(item) {
       const description = item.description || "暂无详细介绍";
@@ -463,11 +417,9 @@ export default {
   right: 0;
   width: 500rpx;
   height: 500rpx;
-  background: radial-gradient(
-    circle,
-    rgba(255, 85, 51, 0.05) 0%,
-    rgba(255, 85, 51, 0) 70%
-  );
+  background: radial-gradient(circle,
+      rgba(255, 85, 51, 0.05) 0%,
+      rgba(255, 85, 51, 0) 70%);
   z-index: 0;
 }
 
@@ -496,7 +448,7 @@ export default {
   font-size: 40rpx;
   font-weight: bold;
   color: #333;
-  background: linear-gradient(135deg, #fffdb4, #9386ff);
+  background: linear-gradient(135deg, #ffffff, #ffffff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   line-height: 1.2;
@@ -693,12 +645,10 @@ export default {
   left: 0;
   right: 0;
   padding: 25rpx;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.9) 0%,
-    rgba(0, 0, 0, 0.5) 50%,
-    rgba(0, 0, 0, 0) 100%
-  );
+  background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.9) 0%,
+      rgba(0, 0, 0, 0.5) 50%,
+      rgba(0, 0, 0, 0) 100%);
 }
 
 .card-title {
@@ -789,11 +739,9 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.2),
-    rgba(255, 255, 255, 0)
-  );
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0));
   border-radius: 50%;
 }
 
@@ -837,6 +785,24 @@ export default {
 }
 
 .dot.active {
+  background: linear-gradient(to right, #ff5533, #ff7755);
+  width: 30rpx;
+}
+
+.pagination-feature-dots {
+  display: flex;
+}
+
+.featureDot {
+  width: 20rpx;
+  height: 6rpx;
+  background-color: #ddd;
+  margin-right: 5rpx;
+  border-radius: 3rpx;
+  transition: all 0.3s;
+}
+
+.featureDot.active {
   background: linear-gradient(to right, #ff5533, #ff7755);
   width: 30rpx;
 }
@@ -895,22 +861,25 @@ export default {
 
 /* 特色体验 */
 .featured-section {
-  margin-bottom: 40rpx;
+  margin-bottom: 3rpx;
 }
 
 .featured-grid {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  white-space: nowrap;
+  margin: 0 -30rpx;
+  padding: 0 30rpx;
 }
 
 .featured-card {
-  width: 48%;
+  display: inline-block;
+  width: 320rpx;
   border-radius: 20rpx;
   overflow: hidden;
   box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.1);
-  margin-bottom: 20rpx;
+  margin-right: 20rpx;
   transition: all 0.3s;
+  vertical-align: top;
+  margin-bottom: 10px
 }
 
 .featured-card:hover {

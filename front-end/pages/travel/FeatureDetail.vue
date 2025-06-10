@@ -1,5 +1,8 @@
 <template>
-  <view class="container">
+  <view
+    class="container"
+    :style="{ backgroundImage: 'url(' + destination.image + ')' }"
+  >
     <!-- 返回按钮 -->
     <view class="back-button" @tap="goBack">← 返回</view>
 
@@ -159,48 +162,48 @@ export default {
       // 检查用户是否已登录
       if (!isAuthenticated()) {
         uni.showModal({
-          title: '提示',
-          content: '请先登录后再收藏',
-          confirmText: '去登录',
-          cancelText: '取消',
+          title: "提示",
+          content: "请先登录后再收藏",
+          confirmText: "去登录",
+          cancelText: "取消",
           success: (res) => {
             if (res.confirm) {
               uni.navigateTo({
-                url: '/pages/login/login'
+                url: "/pages/login/login",
               });
             }
-          }
+          },
         });
         return;
       }
 
       this.bookmarkLoading = true;
       const originalBookmarkState = this.destination.isBookmarked;
-      
+
       // 乐观更新UI
       this.destination.isBookmarked = !this.destination.isBookmarked;
-      
+
       try {
         const response = await request.patch(
           `/travel/featured-experiences/${this.destinationId}/bookmark`,
           {},
           true
         );
-        
+
         if (response.success) {
           // 更新本地数据
           this.destination = { ...this.destination, ...response.data };
-          
+
           // 更新本地收藏缓存
           this.updateLocalBookmarkCache();
-          
+
           // 显示成功提示
           uni.showToast({
             title: this.destination.isBookmarked ? "已添加收藏" : "已取消收藏",
             icon: "success",
-            duration: 1500
+            duration: 1500,
           });
-          
+
           // 震动反馈
           uni.vibrateShort();
         } else {
@@ -208,15 +211,15 @@ export default {
           this.destination.isBookmarked = originalBookmarkState;
           uni.showToast({
             title: response.message || "操作失败",
-            icon: "none"
+            icon: "none",
           });
         }
       } catch (error) {
-        console.error('收藏操作失败:', error);
-        
+        console.error("收藏操作失败:", error);
+
         // 恢复原状态
         this.destination.isBookmarked = originalBookmarkState;
-        
+
         // 根据错误类型显示不同提示
         let errorMessage = "网络异常，请检查网络连接";
         if (error.statusCode === 401) {
@@ -225,7 +228,7 @@ export default {
           clearToken();
           setTimeout(() => {
             uni.navigateTo({
-              url: '/pages/login/login'
+              url: "/pages/login/login",
             });
           }, 1500);
         } else if (error.statusCode === 404) {
@@ -233,11 +236,11 @@ export default {
         } else if (error.statusCode >= 500) {
           errorMessage = "服务器异常，请稍后重试";
         }
-        
+
         uni.showToast({
           title: errorMessage,
           icon: "none",
-          duration: 2000
+          duration: 2000,
         });
       } finally {
         this.bookmarkLoading = false;
@@ -295,12 +298,16 @@ export default {
 };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .container {
+  position:relative;
   padding: 40rpx;
-  background-color: #f3f5f7;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   min-height: 100vh;
 }
+
 
 .back-button {
   font-size: 28rpx;
