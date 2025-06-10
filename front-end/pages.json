@@ -76,6 +76,13 @@
       }
     },
     {
+      "path": "pages/travel/UsefulInfo",
+      "style": {
+        "navigationBarTitleText": "实用信息",
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/login/register",
       "style": {
         "navigationBarTitleText": "注册",

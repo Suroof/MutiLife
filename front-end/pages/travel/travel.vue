@@ -133,6 +133,7 @@
             v-for="(item, index) in infoCards"
             :key="'dot-' + index"
             :class="{ active: infoCardIndex === index }"
+             @tap="goToUsefulInfomation(item)"
           ></view>
         </view>
       </view>
@@ -277,6 +278,7 @@ export default {
         });
       } finally {
         this.loading.destinations = false;
+        this.filterContent(); 
       }
     },
 
@@ -408,6 +410,12 @@ export default {
         content: formattedDescription,
         showCancel: false,
         confirmText: "确定",
+      });
+    },
+
+    goToUsefulInfomation(item){
+      uni.navigateTo({
+        url: `/pages/travel/UsefulInformation?id=${item._id}`,
       });
     },
 
