@@ -8,6 +8,7 @@ const InfoCardSchema = new Schema({
   buttonText: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
+  info: { type: String, required: true }
 });
 
 module.exports = mongoose.model('InfoCard', InfoCardSchema);

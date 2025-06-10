@@ -133,7 +133,6 @@
             v-for="(item, index) in infoCards"
             :key="'dot-' + index"
             :class="{ active: infoCardIndex === index }"
-             @tap="goToUsefulInfomation(item)"
           ></view>
         </view>
       </view>
@@ -154,6 +153,7 @@
           class="info-card"
           v-for="(item, index) in infoCards"
           :key="'info-' + index"
+          @tap="goToUsefulInfomation(item._id)"
         >
           <image class="info-image" :src="item.image" mode="aspectFill"></image>
           <view class="info-button">{{ item.buttonText || "Learn more" }}</view>
@@ -196,11 +196,9 @@
       </view>
     </view>
 
-    <!-- Padding at bottom to account for tab bar -->
     <view style="height: -10rpx"></view>
   </view>
 
-  <!-- 自定义底部导航栏 -->
   <CustomTabBar />
 </template>
 
@@ -278,7 +276,7 @@ export default {
         });
       } finally {
         this.loading.destinations = false;
-        this.filterContent(); 
+        this.filterContent();
       }
     },
 
@@ -413,9 +411,9 @@ export default {
       });
     },
 
-    goToUsefulInfomation(item){
+    goToUsefulInfomation(id) {
       uni.navigateTo({
-        url: `/pages/travel/UsefulInformation?id=${item._id}`,
+        url: `/pages/travel/UsefulInfo?id=${id}`,
       });
     },
 
@@ -481,7 +479,7 @@ export default {
   margin-bottom: 30rpx;
   position: relative;
   z-index: 1;
-  background-image:linear-gradient(135deg, #f16021, #f3ba71) ;
+  background-image: linear-gradient(135deg, #f16021, #f3ba71);
   border-radius: 18px;
 }
 
@@ -498,11 +496,11 @@ export default {
   font-size: 40rpx;
   font-weight: bold;
   color: #333;
-  background:linear-gradient(135deg, #fffdb4, #9386ff);
+  background: linear-gradient(135deg, #fffdb4, #9386ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   line-height: 1.2;
-  margin-left:11px;
+  margin-left: 11px;
 }
 
 .avatar-container {

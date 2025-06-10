@@ -32,7 +32,7 @@
       "path": "pages/travel/FeatureDetail",
       "style": {
         "navigationBarTitleText": "详情",
-		"navigationStyle": "custom"
+        "navigationStyle": "custom"
       }
     },
     {

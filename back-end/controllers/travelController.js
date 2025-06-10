@@ -68,6 +68,26 @@ exports.getInfoCards = async (req, res) => {
   }
 };
 
+// @route   GET api/travel/infocards/:id
+// @desc    获取单个信息卡片详情
+// @access  Public
+exports.getInfoCardById = async (req, res) => {
+  try {
+    const infoCard = await InfoCard.findById(req.params.id);
+    if (!infoCard) {
+      return res
+        .status(404)
+        .json({ success: false, message: "信息卡片不存在" });
+    }
+    res.json({ success: true, data: infoCard });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "获取信息卡片详情失败",
+    });
+  }
+};
+
 // @route   GET api/travel/featured-experiences
 // @desc    获取所有特色体验
 // @access  Public

@@ -14,6 +14,9 @@ router.get('/activities', travelController.getActivities);
 // 获取所有信息卡片
 router.get('/infocards', travelController.getInfoCards);
 
+// 获取单个信息卡片详情
+router.get('/infocards/:id', travelController.getInfoCardById);
+
 // 获取所有特色体验
 router.get('/featured-experiences', travelController.getFeaturedExperiences);
 
