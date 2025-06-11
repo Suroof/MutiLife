@@ -63,15 +63,17 @@
             <text class="comment-text">{{ item.content }}</text>
             <view class="comment-actions">
               <view class="action-item" @tap="likeComment(index)">
-                <text
-                  class="iconfont action-icon"
+                <uni-icons
+                  type="hand-up"
+                  size="16"
+                  color="#999"
                   :class="{ liked: item.isLiked }"
-                  >&#xe626;</text
-                >
+                  @click="toggleLike(item)"
+                />
                 <text class="action-text">{{ item.likes }}</text>
               </view>
               <view class="action-item" @tap="replyComment(index)">
-                <text class="iconfont action-icon">&#xe622;</text>
+                <uni-icon type="chat" size="16" color="#999" />
                 <text class="action-text">回复</text>
               </view>
             </view>
@@ -91,57 +93,40 @@
       </view>
       <view class="action-buttons">
         <view class="action-button" @tap="likeArticle">
-          <text class="iconfont action-icon" :class="{ liked: isLiked }"
-            >&#xe626;</text
-          >
+          <uni-icons
+            type="hand-up"
+            size="24"
+            color="#999"
+            :class="{ liked: isLiked }"
+          />
           <text class="action-count">{{ newsDetail.likes }}</text>
         </view>
         <view class="action-button" @tap="collectArticle">
-          <text class="iconfont action-icon" :class="{ collected: isCollected }"
-            >&#xe621;</text
-          >
+          <uni-icons
+            type="star"
+            size="24"
+            color="#999"
+            :class="{ collected: isCollected }"
+          />
           <text class="action-count">{{ newsDetail.collections }}</text>
         </view>
         <view class="action-button" @tap="shareArticle">
-          <text class="iconfont action-icon">&#xe620;</text>
+          <uni-icons type="undo" size="24" color="#999" />
           <text class="action-count">{{ newsDetail.shares }}</text>
         </view>
       </view>
     </view>
 
-    <!-- 评论弹出层 -->
-    <uni-popup ref="commentPopup" type="bottom">
-      <view class="popup-comment">
-        <view class="popup-header">
-          <text class="popup-title">发表评论</text>
-          <text class="popup-close" @tap="closeCommentPopup">取消</text>
-        </view>
-        <view class="popup-content">
-          <textarea
-            class="comment-textarea"
-            v-model="commentText"
-            placeholder="说点什么吧..."
-            :focus="popupFocus"
-            auto-height
-          />
-        </view>
-        <view class="popup-footer">
-          <button
-            class="submit-btn"
-            :disabled="!commentText.trim()"
-            @tap="submitComment"
-          >
-            发布
-          </button>
-        </view>
-      </view>
-    </uni-popup>
   </view>
 </template>
 
 <script>
 import request from "@/services/api/request.js";
+import uniIcons from "@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue";
 export default {
+  components: {
+    uniIcons,
+  },
   data() {
     return {
       newsId: 0,

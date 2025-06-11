@@ -15,6 +15,7 @@ const config = {
   // 请求超时时间（毫秒）
   timeout: 15000, // 15秒
 
+  
   // 请求头设置
   headers: {
     "Content-Type": "application/json",

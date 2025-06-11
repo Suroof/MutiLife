@@ -35,6 +35,10 @@ const NewsCommentSchema = new mongoose.Schema({
     type: String,
     enum: ['active', 'hidden', 'deleted'],
     default: 'active'
+  },
+  avatar: {
+    type: String,
+    default: ''
   }
 }, { timestamps: true });
 
