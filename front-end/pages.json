@@ -167,6 +167,16 @@
       }
     },
     {
+      "path": "pages/music/my-list/mylist",
+      "style": {
+        "navigationBarTitleText": "我的歌单",
+        "app-plus": {
+          "animationType": "slide-in-right",
+          "animationDuration": 300
+        }
+      }
+    },
+    {
       "path": "pages/social/group-info",
       "style": {
         "navigationBarTitleText": "群组信息",
